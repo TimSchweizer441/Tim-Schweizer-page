@@ -305,7 +305,7 @@ interface Skill {
           </section>
         }
 
-        <!-- TAB 4: ARCHITECTURE & CODE SETUP -->
+        <!-- TAB 4: ARCHITECTURE & CODE SETUP or more-->
         @if (activeTab() === 'architecture') {
           <section class="space-y-8">
             <div>
@@ -429,7 +429,7 @@ export class App {
       highlight: true
     },
     {
-      title: 'Automated CI/CD Deployment Pipeline',
+      title: 'Automated CI/CD Deployment Pipeline for my project',
       category: 'Cloud & Infrastructure',
       description: 'Production-ready GitHub Actions workflow for building Docker containers, testing FastAPI endpoints, and deploying to cloud instances.',
       techStack: ['GitHub Actions', 'Docker Hub', 'Linux / Bash', 'PostgreSQL'],
