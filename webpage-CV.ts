@@ -1,5 +1,119 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, Directive, ElementRef, OnDestroy, OnInit, Renderer2, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval } from 'rxjs';
+
+interface RedditPost {
+  id: string;
+  title: string;
+  subreddit: string;
+  permalink: string;
+  selftext: string;
+  createdUtc: number;
+  score: number;
+  numComments: number;
+  viewCount: number | null;
+}
+
+interface RedditPostsResponse {
+  posts: RedditPost[];
+}
+
+interface GitHubRepository {
+  id: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  description: string | null;
+  language: string | null;
+  stars: number;
+  forks: number;
+  updatedAt: string;
+}
+
+interface GitHubRepositoriesResponse {
+  repositories: GitHubRepository[];
+}
+
+function getRedditErrorMessage(error: unknown): string {
+  if (
+    error instanceof HttpErrorResponse &&
+    typeof error.error === 'object' &&
+    error.error !== null &&
+    'error' in error.error &&
+    typeof error.error.error === 'string'
+  ) {
+    const oauthStatus = error.error.error.match(/^Reddit OAuth returned HTTP (\d+)\.$/);
+    if (oauthStatus) {
+      return `Die Anmeldung bei Reddit ist fehlgeschlagen (HTTP ${oauthStatus[1]}).`;
+    }
+    if (error.error.error.startsWith('Set REDDIT_CLIENT_ID')) {
+      return 'Die Reddit-API-Zugangsdaten in local-app/.env fehlen.';
+    }
+  }
+
+  return 'Reddit-Beiträge konnten nicht geladen werden. Prüfe den API-Server und versuche es erneut.';
+}
+
+function getGitHubErrorMessage(error: unknown): string {
+  if (
+    error instanceof HttpErrorResponse &&
+    typeof error.error === 'object' &&
+    error.error !== null &&
+    'error' in error.error &&
+    typeof error.error.error === 'string'
+  ) {
+    const apiStatus = error.error.error.match(/^GitHub API returned HTTP (\d+)\.$/);
+    if (apiStatus) {
+      return `Die GitHub-API ist nicht erreichbar (HTTP ${apiStatus[1]}).`;
+    }
+  }
+
+  return 'GitHub-Repositories konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
+}
+
+@Directive({
+  selector: '[appRevealOnScroll]',
+  standalone: true,
+})
+export class RevealOnScrollDirective implements OnInit, OnDestroy {
+  private observer?: IntersectionObserver;
+
+  constructor(
+    private readonly element: ElementRef<HTMLElement>,
+    private readonly renderer: Renderer2,
+  ) {}
+
+  ngOnInit() {
+    this.renderer.addClass(this.element.nativeElement, 'scroll-reveal');
+
+    if (
+      typeof window === 'undefined' ||
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      this.renderer.addClass(this.element.nativeElement, 'is-visible');
+      return;
+    }
+
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          this.renderer.addClass(this.element.nativeElement, 'is-visible');
+          this.observer?.unobserve(this.element.nativeElement);
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -32px 0px' },
+    );
+    this.observer.observe(this.element.nativeElement);
+  }
+
+  ngOnDestroy() {
+    this.observer?.disconnect();
+  }
+}
 
 interface Project {
   title: string;
@@ -20,34 +134,54 @@ interface Skill {
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule],
+  imports: [CommonModule, RevealOnScrollDirective],
   template: `
-    <div class="min-h-screen bg-slate-900 text-slate-100 font-sans">
+    <div class="min-h-screen bg-slate-50 text-slate-900 font-sans theme-transition" [class.dark-mode]="isDarkMode()">
       <!-- Top Navigation Bar -->
       <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-4">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-              Dev
-            </div>
+            <img src="/profilebild.jpeg" alt="Tim Schweizer" class="w-12 h-12 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
             <div>
-              <span class="font-bold text-lg text-white block leading-none">John Doe</span>
-              <span class="text-xs text-indigo-400 font-medium">Software Engineer</span>
+              <span class="font-bold text-lg text-white block leading-none">Tim Schweizer</span>
+              <span class="text-xs text-indigo-400 font-medium">Angehender Informatiklehrling</span>
             </div>
           </div>
 
           <!-- Nav Items -->
           <div class="hidden md:flex gap-6 text-sm font-medium">
-            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="hover:text-indigo-300 transition-colors">Overview</button>
-            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="hover:text-indigo-300 transition-colors">Projects</button>
-            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="hover:text-indigo-300 transition-colors">Skills & Stack</button>
-            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="hover:text-indigo-300 transition-colors">Backend & Docker Setup</button>
-            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="hover:text-indigo-300 transition-colors">Contact</button>
+            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="hover:text-indigo-300 transition-colors">Über mich</button>
+            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="hover:text-indigo-300 transition-colors">Projekte</button>
+            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="hover:text-indigo-300 transition-colors">Fähigkeiten &amp; Technologien</button>
+            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="hover:text-indigo-300 transition-colors">Backend &amp; Docker</button>
+            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="hover:text-indigo-300 transition-colors">Kontakt</button>
           </div>
 
           <a href="#contact" (click)="activeTab.set('contact')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition-all shadow-md shadow-indigo-600/30">
-            Get in Touch
+            Kontakt aufnehmen
           </a>
+          <button
+            type="button"
+            role="switch"
+            [attr.aria-checked]="isDarkMode()"
+            [attr.aria-label]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
+            [title]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
+            (click)="toggleTheme()"
+            class="theme-toggle"
+          >
+            <span class="theme-toggle-track" [class.is-dark]="isDarkMode()">
+              <span class="theme-toggle-thumb">
+                <svg class="theme-toggle-sun" [class.is-hidden]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                </svg>
+                <svg class="theme-toggle-moon" [class.is-visible]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                  <path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"></path>
+                </svg>
+              </span>
+            </span>
+            <span class="theme-toggle-label">{{ isDarkMode() ? 'Nacht' : 'Tag' }}</span>
+          </button>
         </div>
       </nav>
 
@@ -58,71 +192,71 @@ interface Skill {
         @if (activeTab() === 'overview') {
           <section class="space-y-12">
             <!-- Hero Section -->
-            <div class="flex flex-col md:flex-row items-center gap-10 py-8">
-              <div class="flex-1 space-y-6">
+            <div appRevealOnScroll class="flex flex-col md:flex-row items-center gap-10 py-8">
+              <div appRevealOnScroll class="flex-1 space-y-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Open for Full-Stack / Backend Opportunities
+                  Auf der Suche nach einer Lehrstelle als Informatiker
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Building Scalable <br/>
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">Web Applications</span>
+                  Ich entwickle <br/>
+                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">moderne Webanwendungen</span>
                 </h1>
                 <p class="text-slate-400 text-base md:text-lg leading-relaxed">
-                  Passionate Software Developer specialized in modern Angular Frontend architectures, high-performance FastAPI Python backends, and containerized Docker deployments with PostgreSQL databases.
+                  Ich interessiere mich für moderne Webentwicklung und arbeite mit Angular, Python, FastAPI, Docker und PostgreSQL.
                 </p>
 
                 <div class="flex flex-wrap gap-4 pt-2">
                   <button (click)="activeTab.set('projects')" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/25">
-                    <span>Explore Projects</span>
+                    <span>Projekte entdecken</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </button>
                   <button (click)="activeTab.set('architecture')" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center gap-2">
                     <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    <span>View Architecture</span>
+                    <span>Architektur ansehen</span>
                   </button>
                 </div>
               </div>
 
               <!-- Tech Badge Stack Visual -->
-              <div class="w-full md:w-80 bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur relative overflow-hidden">
+              <div appRevealOnScroll class="w-full md:w-80 bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Core Technology Stack</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Meine Technologien</h3>
                 <div class="space-y-3">
                   <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-red-500"></span>
                       <span class="text-sm font-semibold text-slate-200">Angular 18+</span>
                     </div>
-                    <span class="text-xs text-slate-400">Frontend</span>
+                    <span class="text-xs text-slate-400">Benutzeroberfläche</span>
                   </div>
                   <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                       <span class="text-sm font-semibold text-slate-200">FastAPI (Python)</span>
                     </div>
-                    <span class="text-xs text-slate-400">Backend</span>
+                    <span class="text-xs text-slate-400">Server</span>
                   </div>
                   <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-blue-500"></span>
                       <span class="text-sm font-semibold text-slate-200">PostgreSQL</span>
                     </div>
-                    <span class="text-xs text-slate-400">Database</span>
+                    <span class="text-xs text-slate-400">Datenbank</span>
                   </div>
                   <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
                       <span class="text-sm font-semibold text-slate-200">Docker & Compose</span>
                     </div>
-                    <span class="text-xs text-slate-400">DevOps</span>
+                    <span class="text-xs text-slate-400">Betrieb</span>
                   </div>
                   <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-purple-400"></span>
                       <span class="text-sm font-semibold text-slate-200">GitHub Actions</span>
                     </div>
-                    <span class="text-xs text-slate-400">CI/CD</span>
+                    <span class="text-xs text-slate-400">Automatisierung</span>
                   </div>
                 </div>
               </div>
@@ -130,22 +264,139 @@ interface Skill {
 
             <!-- Quick Stats / Highlights -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-              <div class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-indigo-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Clean Code</div>
-                <h3 class="text-lg font-bold text-white mb-2">Maintainable Architecture</h3>
-                <p class="text-sm text-slate-400">Adhering to SOLID principles, Angular standalone components, and clean FastAPI REST controllers.</p>
+              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
+                <div class="text-indigo-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Sauberer Code</div>
+                <h3 class="text-lg font-bold text-white mb-2">Wartbare Architektur</h3>
+                <p class="text-sm text-slate-400">Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.</p>
               </div>
-              <div class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-cyan-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">DevOps Mindset</div>
-                <h3 class="text-lg font-bold text-white mb-2">Automated Deployments</h3>
-                <p class="text-sm text-slate-400">Fully containerized workflows with Docker Compose and automated CI/CD via GitHub Actions.</p>
+              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
+                <div class="text-cyan-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">DevOps</div>
+                <h3 class="text-lg font-bold text-white mb-2">Automatisierte Bereitstellung</h3>
+                <p class="text-sm text-slate-400">Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.</p>
               </div>
-              <div class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-emerald-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Data Management</div>
-                <h3 class="text-lg font-bold text-white mb-2">SQL & ORM Proficiency</h3>
-                <p class="text-sm text-slate-400">Relational data modeling with PostgreSQL, Alembic migrations, and SQLAlchemy async driver.</p>
+              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
+                <div class="text-emerald-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Datenverwaltung</div>
+                <h3 class="text-lg font-bold text-white mb-2">SQL &amp; Datenbanken</h3>
+                <p class="text-sm text-slate-400">Relationale Datenmodelle mit PostgreSQL, Alembic-Migrationen und SQLAlchemy.</p>
               </div>
             </div>
+
+            <section appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <p class="text-orange-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Reddit</p>
+                  <h2 class="text-2xl font-bold text-white">Meine Reddit-Beiträge</h2>
+                  <p class="text-slate-400 text-sm mt-1">Meine neuesten Beiträge von u/Timschweizerch.</p>
+                </div>
+                <a href="https://www.reddit.com/user/Timschweizerch/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-sm font-semibold transition-colors">
+                  Reddit-Profil ansehen &rarr;
+                </a>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs text-slate-500" aria-live="polite">
+                  @if (redditLastUpdated()) {
+                    Aktualisiert um {{ redditLastUpdated() | date:'shortTime' }} · automatische Aktualisierung alle 5 Minuten
+                  } @else {
+                    Beiträge werden direkt von Reddit geladen
+                  }
+                </p>
+                <button type="button" (click)="refreshRedditPosts()" [disabled]="redditLoading()" class="px-3 py-2 text-xs font-semibold text-slate-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 rounded-lg">
+                  {{ redditLoading() ? 'Wird geladen ...' : 'Beiträge aktualisieren' }}
+                </button>
+              </div>
+
+              @if (redditError()) {
+                <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
+                  {{ redditError() }}
+                </div>
+              } @else if (redditLoading() && redditPosts().length === 0) {
+                <p class="text-sm text-slate-400" role="status">Deine neuesten Reddit-Beiträge werden geladen ...</p>
+              } @else if (redditPosts().length === 0) {
+                <p class="text-sm text-slate-400">Für dieses Reddit-Konto wurden keine öffentlichen Beiträge gefunden.</p>
+              }
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @for (post of redditPosts(); track post.id) {
+                  <article class="bg-slate-900/70 border border-slate-700 rounded-xl p-5">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                      <span class="text-xs font-semibold px-2.5 py-1 rounded bg-orange-500/10 text-orange-300 border border-orange-500/20">{{ post.subreddit }}</span>
+                      <span class="text-xs text-slate-400">{{ post.score | number }} Punkte</span>
+                      <span class="text-xs text-slate-400">{{ post.numComments | number }} Kommentare</span>
+                      @if (post.viewCount !== null) {
+                        <span class="text-xs text-slate-400">{{ post.viewCount | number }} Aufrufe</span>
+                      }
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">{{ post.title }}</h3>
+                    @if (post.selftext) {
+                      <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{{ post.selftext }}</p>
+                    }
+                    <div class="flex items-center justify-between gap-4 mt-4">
+                      <span class="text-xs text-slate-500">{{ post.createdUtc * 1000 | date:'mediumDate' }}</span>
+                      <a [href]="post.permalink" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-orange-400 hover:text-orange-300">
+                        Auf Reddit ansehen &rarr;
+                      </a>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+
+            <section appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <p class="text-slate-300 mb-2 font-mono text-xs uppercase tracking-wider font-bold">GitHub</p>
+                  <h2 class="text-2xl font-bold text-white">Meine GitHub-Projekte</h2>
+                  <p class="text-slate-400 text-sm mt-1">Meine neuesten öffentlichen Repositories von {{ githubUsername }}.</p>
+                </div>
+                <a href="https://github.com/{{ githubUsername }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors">
+                  GitHub-Profil ansehen &rarr;
+                </a>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs text-slate-500" aria-live="polite">
+                  @if (githubLastUpdated()) {
+                    Aktualisiert um {{ githubLastUpdated() | date:'shortTime' }} · automatische Aktualisierung alle 5 Minuten
+                  } @else {
+                    Repositories werden direkt von GitHub geladen
+                  }
+                </p>
+                <button type="button" (click)="refreshGitHubRepositories()" [disabled]="githubLoading()" class="px-3 py-2 text-xs font-semibold text-slate-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 rounded-lg">
+                  {{ githubLoading() ? 'Wird geladen ...' : 'Repositories aktualisieren' }}
+                </button>
+              </div>
+
+              @if (githubError()) {
+                <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
+                  {{ githubError() }}
+                </div>
+              } @else if (githubLoading() && githubRepositories().length === 0) {
+                <p class="text-sm text-slate-400" role="status">Deine neuesten GitHub-Repositories werden geladen ...</p>
+              } @else if (githubRepositories().length === 0) {
+                <p class="text-sm text-slate-400">Für dieses GitHub-Konto wurden keine öffentlichen Repositories gefunden.</p>
+              }
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @for (repository of githubRepositories(); track repository.id) {
+                  <article class="bg-slate-900/70 border border-slate-700 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold text-white mb-2">{{ repository.name }}</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed min-h-10">{{ repository.description || 'Keine Beschreibung vorhanden.' }}</p>
+                    <div class="flex flex-wrap items-center gap-3 mt-4 text-xs text-slate-400">
+                      @if (repository.language) {
+                        <span class="px-2 py-1 rounded bg-slate-800">{{ repository.language }}</span>
+                      }
+                      <span>{{ repository.stars | number }} Sterne</span>
+                      <span>{{ repository.forks | number }} Forks</span>
+                      <span>Aktualisiert am {{ repository.updatedAt | date:'mediumDate' }}</span>
+                    </div>
+                    <a [href]="repository.htmlUrl" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 text-sm font-semibold text-indigo-400 hover:text-indigo-300">
+                      Repository ansehen &rarr;
+                    </a>
+                  </article>
+                }
+              </div>
+            </section>
           </section>
         }
 
@@ -153,20 +404,20 @@ interface Skill {
         @if (activeTab() === 'projects') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Featured Applications</h2>
-              <p class="text-slate-400 text-sm mt-1">Real-world projects showcasing Angular, FastAPI, and Database integration.</p>
+              <h2 class="text-2xl font-bold text-white">Ausgewählte Anwendungen</h2>
+              <p class="text-slate-400 text-sm mt-1">Projekte mit Angular, FastAPI und Datenbankanbindung.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               @for (proj of projects(); track proj.title) {
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+                <div appRevealOnScroll class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
                   <div>
                     <div class="flex justify-between items-start mb-3">
                       <span class="text-xs font-semibold px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                         {{ proj.category }}
                       </span>
                       @if (proj.highlight) {
-                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">Featured</span>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">Ausgewählt</span>
                       }
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">{{ proj.title }}</h3>
@@ -183,7 +434,7 @@ interface Skill {
                     </div>
                     <div class="flex items-center gap-4 text-sm font-semibold">
                       <a [href]="proj.githubUrl" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
-                        GitHub Repo &rarr;
+                        GitHub-Repository &rarr;
                       </a>
                     </div>
                   </div>
@@ -197,23 +448,23 @@ interface Skill {
         @if (activeTab() === 'skills') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Technical Skillset</h2>
-              <p class="text-slate-400 text-sm mt-1">Categorized breakdown of tools, frameworks, and database technologies.</p>
+              <h2 class="text-2xl font-bold text-white">Meine Fähigkeiten</h2>
+              <p class="text-slate-400 text-sm mt-1">Ein Überblick über meine Werkzeuge, Frameworks und Datenbanktechnologien.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <!-- Frontend & Backend -->
-              <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
+              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <h3 class="text-lg font-bold text-indigo-400 flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                  Software Development & Frameworks
+                  Softwareentwicklung &amp; Frameworks
                 </h3>
 
                 <div class="space-y-4">
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">Angular & Angular Material</span>
-                      <span class="text-indigo-400">Advanced</span>
+                      <span class="text-indigo-400">Fortgeschritten</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-indigo-500 h-2 rounded-full" style="width: 90%"></div>
@@ -223,7 +474,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">Python & FastAPI / Pydantic</span>
-                      <span class="text-emerald-400">Advanced</span>
+                      <span class="text-emerald-400">Fortgeschritten</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-500 h-2 rounded-full" style="width: 88%"></div>
@@ -233,7 +484,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">TypeScript & RxJS / Signals</span>
-                      <span class="text-indigo-400">Proficient</span>
+                      <span class="text-indigo-400">Gute Kenntnisse</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-indigo-400 h-2 rounded-full" style="width: 85%"></div>
@@ -243,7 +494,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">RESTful API Design & OpenAPI</span>
-                      <span class="text-emerald-400">Advanced</span>
+                      <span class="text-emerald-400">Fortgeschritten</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-400 h-2 rounded-full" style="width: 92%"></div>
@@ -253,17 +504,17 @@ interface Skill {
               </div>
 
               <!-- Database & DevOps -->
-              <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
+              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <h3 class="text-lg font-bold text-cyan-400 flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
-                  Database & Infrastructure
+                  Datenbanken &amp; Infrastruktur
                 </h3>
 
                 <div class="space-y-4">
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">PostgreSQL & SQL Optimization</span>
-                      <span class="text-cyan-400">Proficient</span>
+                      <span class="text-cyan-400">Gute Kenntnisse</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-cyan-500 h-2 rounded-full" style="width: 82%"></div>
@@ -273,7 +524,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">Docker & Docker Compose</span>
-                      <span class="text-cyan-400">Proficient</span>
+                      <span class="text-cyan-400">Gute Kenntnisse</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-cyan-400 h-2 rounded-full" style="width: 80%"></div>
@@ -283,7 +534,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">Git & GitHub Actions CI/CD</span>
-                      <span class="text-purple-400">Proficient</span>
+                      <span class="text-purple-400">Gute Kenntnisse</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-purple-500 h-2 rounded-full" style="width: 85%"></div>
@@ -293,7 +544,7 @@ interface Skill {
                   <div>
                     <div class="flex justify-between text-sm font-medium mb-1">
                       <span class="text-slate-200">SQLAlchemy & Database Migrations</span>
-                      <span class="text-emerald-400">Proficient</span>
+                      <span class="text-emerald-400">Gute Kenntnisse</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-400 h-2 rounded-full" style="width: 78%"></div>
@@ -309,17 +560,17 @@ interface Skill {
         @if (activeTab() === 'architecture') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Application Architecture & Docker Setup</h2>
-              <p class="text-slate-400 text-sm mt-1">Inspect the backend blueprint, database model, Docker multi-stage build, and GitHub deployment files.</p>
+              <h2 class="text-2xl font-bold text-white">Anwendungsarchitektur &amp; Docker</h2>
+              <p class="text-slate-400 text-sm mt-1">Einblick in Backend, Datenbankmodell, Docker-Konfiguration und GitHub-Bereitstellung.</p>
             </div>
 
             <!-- Code Viewer Selector -->
             <div class="flex gap-2 overflow-x-auto pb-2 border-b border-slate-800">
               <button (click)="selectedCodeFile.set('fastapi')" [class.border-indigo-500]="selectedCodeFile() === 'fastapi'" [class.text-indigo-400]="selectedCodeFile() === 'fastapi'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
-                main.py (FastAPI Backend)
+                main.py (FastAPI-Backend)
               </button>
               <button (click)="selectedCodeFile.set('database')" [class.border-indigo-500]="selectedCodeFile() === 'database'" [class.text-indigo-400]="selectedCodeFile() === 'database'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
-                database.py (PostgreSQL)
+                database.py (PostgreSQL-Datenbank)
               </button>
               <button (click)="selectedCodeFile.set('docker')" [class.border-indigo-500]="selectedCodeFile() === 'docker'" [class.text-indigo-400]="selectedCodeFile() === 'docker'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
                 docker-compose.yml
@@ -330,10 +581,10 @@ interface Skill {
             </div>
 
             <!-- Code Display Block -->
-            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 font-mono text-xs md:text-sm text-slate-300 overflow-x-auto shadow-2xl relative">
+            <div appRevealOnScroll class="bg-slate-950 border border-slate-800 rounded-2xl p-5 font-mono text-xs md:text-sm text-slate-300 overflow-x-auto shadow-2xl relative">
               <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-800/80 text-slate-500">
                 <span class="text-xs text-indigo-400 font-semibold">{{ getFileTitle(selectedCodeFile()) }}</span>
-                <span class="text-xs">UTF-8 / Configured for Deployment</span>
+                <span class="text-xs">UTF-8 / Für Bereitstellung konfiguriert</span>
               </div>
               <pre class="leading-relaxed"><code>{{ getCodeSnippet(selectedCodeFile()) }}</code></pre>
             </div>
@@ -344,37 +595,37 @@ interface Skill {
         @if (activeTab() === 'contact') {
           <section class="max-w-2xl mx-auto space-y-8">
             <div class="text-center">
-              <h2 class="text-3xl font-bold text-white">Get In Touch</h2>
-              <p class="text-slate-400 text-sm mt-2">I am looking forward to discussing job opportunities, software projects, or collaboration.</p>
+              <h2 class="text-3xl font-bold text-white">Kontakt</h2>
+              <p class="text-slate-400 text-sm mt-2">Ich freue mich über den Austausch zu Ausbildungsplätzen, Softwareprojekten und Zusammenarbeit.</p>
             </div>
 
-            <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-8 space-y-6">
+            <div appRevealOnScroll class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-8 space-y-6">
               @if (formSubmitted()) {
                 <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center space-y-2">
                   <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold">✓</div>
-                  <h3 class="text-lg font-bold text-white">Message Sent Successfully!</h3>
-                  <p class="text-sm text-slate-300">Thank you for your message. In a production environment, this triggers an API call to FastAPI & PostgreSQL.</p>
-                  <button (click)="formSubmitted.set(false)" class="mt-4 text-xs font-semibold text-indigo-400 hover:underline">Send another message</button>
+                  <h3 class="text-lg font-bold text-white">Nachricht erfolgreich gesendet!</h3>
+                  <p class="text-sm text-slate-300">Vielen Dank für deine Nachricht. In der produktiven Version wird sie an FastAPI und PostgreSQL übermittelt.</p>
+                  <button (click)="formSubmitted.set(false)" class="mt-4 text-xs font-semibold text-indigo-400 hover:underline">Weitere Nachricht senden</button>
                 </div>
               } @else {
                 <form (submit)="handleSubmit($event)" class="space-y-4">
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Your Name</label>
-                    <input type="text" required placeholder="e.g. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Dein Name</label>
+                    <input type="text" required placeholder="z. B. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-                    <input type="email" required placeholder="name@company.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <label class="block text-xs font-medium text-slate-300 mb-1">E-Mail-Adresse</label>
+                    <input type="email" required placeholder="name@beispiel.ch" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Message / Inquiry</label>
-                    <textarea rows="4" required placeholder="Hi John, we would like to invite you for an interview..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Deine Nachricht</label>
+                    <textarea rows="4" required placeholder="Hallo Tim, ich würde dich gerne kennenlernen ..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
                   </div>
 
                   <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/25">
-                    Submit Message (FastAPI Backend Test)
+                    Nachricht senden
                   </button>
                 </form>
               }
@@ -382,11 +633,11 @@ interface Skill {
               <div class="pt-6 border-t border-slate-700/60 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400">
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                  <span>john.doe.dev&#64;example.com</span>
+                  <a href="mailto:timschweizer.ch@gmail.com" class="hover:text-indigo-400">timschweizer.ch&#64;gmail.com</a>
                 </div>
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  <span>Germany / Remote</span>
+                  <span>Schweiz</span>
                 </div>
               </div>
             </div>
@@ -398,45 +649,125 @@ interface Skill {
       <!-- Footer -->
       <footer class="mt-20 border-t border-slate-800 py-8 text-center text-xs text-slate-500">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {{ currentYear }} John Doe — Professional IT Application Portfolio</p>
-          <p class="font-mono text-slate-600">Built with Angular + FastAPI + PostgreSQL + Docker</p>
+          <p>© {{ currentYear }} Tim Schweizer — Portfolio</p>
+          <p class="font-mono text-slate-600">Erstellt mit Angular, FastAPI, PostgreSQL und Docker</p>
         </div>
       </footer>
     </div>
   `
 })
 export class App {
+  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
+
   activeTab = signal<'overview' | 'projects' | 'skills' | 'architecture' | 'contact'>('overview');
   selectedCodeFile = signal<'fastapi' | 'database' | 'docker' | 'github'>('fastapi');
   formSubmitted = signal(false);
   currentYear = new Date().getFullYear();
+  isDarkMode = signal(false);
+  redditPosts = signal<RedditPost[]>([]);
+  redditLoading = signal(false);
+  redditError = signal('');
+  redditLastUpdated = signal<Date | null>(null);
+  githubUsername = 'TimSchweizer441';
+  githubRepositories = signal<GitHubRepository[]>([]);
+  githubLoading = signal(false);
+  githubError = signal('');
+  githubLastUpdated = signal<Date | null>(null);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.isDarkMode.set(window.localStorage.getItem('portfolio-theme') === 'dark');
+    }
+    this.refreshRedditPosts();
+    this.refreshGitHubRepositories();
+    interval(5 * 60 * 1000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshRedditPosts();
+        this.refreshGitHubRepositories();
+      });
+  }
 
   projects = signal<Project[]>([
     {
-      title: 'Full-Stack Task & Workflow Management',
+      title: 'Aufgaben- und Workflow-Management',
       category: 'Angular & FastAPI',
-      description: 'A enterprise workflow engine with real-time status updates, dynamic state handling, and PostgreSQL persistence with database connection pooling.',
+      description: 'Eine Workflow-Anwendung mit Statusaktualisierungen, dynamischer Zustandsverwaltung und PostgreSQL-Datenbankanbindung.',
       techStack: ['Angular 18', 'FastAPI', 'PostgreSQL', 'Docker', 'Tailwind CSS'],
       githubUrl: 'https://github.com',
       highlight: true
     },
     {
-      title: 'Microservice Metric Dashboard',
+      title: 'Metrik-Dashboard für Microservices',
       category: 'DevOps & Backend',
-      description: 'System health monitoring dashboard displaying async data streams from Python endpoints with JWT authentication and Role-Based Access Control.',
+      description: 'Dashboard zur Systemüberwachung mit asynchronen Daten aus Python-Endpunkten, JWT-Authentifizierung und rollenbasierter Zugriffskontrolle.',
       techStack: ['FastAPI', 'SQLAlchemy', 'PostgreSQL', 'Docker Compose', 'Chart.js'],
       githubUrl: 'https://github.com',
       highlight: true
     },
     {
-      title: 'Automated CI/CD Deployment Pipeline for my project',
-      category: 'Cloud & Infrastructure',
-      description: 'Production-ready GitHub Actions workflow for building Docker containers, testing FastAPI endpoints, and deploying to cloud instances.',
+      title: 'Automatisierte CI/CD-Bereitstellung',
+      category: 'Cloud & Infrastruktur',
+      description: 'GitHub-Actions-Ablauf zum Erstellen von Docker-Containern, Testen von FastAPI-Endpunkten und Bereitstellen in der Cloud.',
       techStack: ['GitHub Actions', 'Docker Hub', 'Linux / Bash', 'PostgreSQL'],
       githubUrl: 'https://github.com',
       highlight: false
     }
   ]);
+
+  toggleTheme() {
+    const nextIsDarkMode = !this.isDarkMode();
+    this.isDarkMode.set(nextIsDarkMode);
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('portfolio-theme', nextIsDarkMode ? 'dark' : 'light');
+    }
+  }
+
+  refreshRedditPosts() {
+    if (this.redditLoading()) {
+      return;
+    }
+
+    this.redditLoading.set(true);
+    this.redditError.set('');
+    this.http.get<RedditPostsResponse>('/api/reddit/posts')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ posts }) => {
+          this.redditPosts.set(posts);
+          this.redditLastUpdated.set(new Date());
+          this.redditLoading.set(false);
+        },
+        error: (error: unknown) => {
+          this.redditError.set(getRedditErrorMessage(error));
+          this.redditLoading.set(false);
+        },
+      });
+  }
+
+  refreshGitHubRepositories() {
+    if (this.githubLoading()) {
+      return;
+    }
+
+    this.githubLoading.set(true);
+    this.githubError.set('');
+    this.http.get<GitHubRepositoriesResponse>('/api/github/repos')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ repositories }) => {
+          this.githubRepositories.set(repositories);
+          this.githubLastUpdated.set(new Date());
+          this.githubLoading.set(false);
+        },
+        error: (error: unknown) => {
+          this.githubError.set(getGitHubErrorMessage(error));
+          this.githubLoading.set(false);
+        },
+      });
+  }
 
   handleSubmit(event: Event) {
     event.preventDefault();
@@ -445,10 +776,10 @@ export class App {
 
   getFileTitle(file: string): string {
     switch (file) {
-      case 'fastapi': return 'Backend Application Code (app/main.py)';
-      case 'database': return 'Database Connection & Model Config (app/database.py)';
-      case 'docker': return 'Multi-Container Deployment (docker-compose.yml)';
-      case 'github': return 'Automated CI/CD Pipeline (.github/workflows/deploy.yml)';
+      case 'fastapi': return 'Backend-Anwendungscode (app/main.py)';
+      case 'database': return 'Datenbankverbindung & Modellkonfiguration (app/database.py)';
+      case 'docker': return 'Bereitstellung mehrerer Container (docker-compose.yml)';
+      case 'github': return 'Automatisierte CI/CD-Pipeline (.github/workflows/deploy.yml)';
       default: return '';
     }
   }
