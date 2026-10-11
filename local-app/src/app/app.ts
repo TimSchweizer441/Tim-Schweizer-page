@@ -37,6 +37,120 @@ interface GitHubRepositoriesResponse {
   repositories: GitHubRepository[];
 }
 
+const englishTranslations: Record<string, string> = {
+  'Die Anmeldung bei Reddit ist fehlgeschlagen (HTTP 401).': 'Reddit sign-in failed (HTTP 401).',
+  'Die Reddit-API-Zugangsdaten in local-app/.env fehlen.': 'Reddit API credentials are missing from local-app/.env.',
+  'Reddit-Beiträge konnten nicht geladen werden. Prüfe den API-Server und versuche es erneut.': 'Could not load Reddit posts. Check the API server and try again.',
+  'Die GitHub-API ist nicht erreichbar (HTTP 403).': 'The GitHub API is unavailable (HTTP 403).',
+  'GitHub-Repositories konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.': 'Could not load GitHub repositories. Check your connection and try again.',
+  'Der E-Mail-Versand ist noch nicht eingerichtet. Bitte trage die Gmail-SMTP-Daten in local-app/.env ein.': 'Email delivery is not configured. Add the Gmail SMTP settings to local-app/.env.',
+  'Bitte überprüfe deine Angaben und versuche es erneut.': 'Please check your details and try again.',
+  'Die E-Mail konnte nicht zugestellt werden. Bitte versuche es später erneut.': 'The email could not be delivered. Please try again later.',
+  'Die Nachricht konnte nicht gesendet werden. Bitte überprüfe deine Verbindung und versuche es erneut.': 'The message could not be sent. Check your connection and try again.',
+  'Das Kontaktformular konnte nicht gelesen werden. Bitte lade die Seite neu.': 'The contact form could not be read. Please reload the page.',
+  'Bitte fülle alle Felder aus.': 'Please fill in all fields.',
+  'Der E-Mail-Versand konnte nicht bestätigt werden. Bitte versuche es erneut.': 'Email delivery could not be confirmed. Please try again.',
+  'Tim Schweizer': 'Tim Schweizer',
+  'Angehender Informatiklehrling': 'Aspiring IT apprentice',
+  'Über mich': 'About me',
+  'Projekte': 'Projects',
+  'Fähigkeiten & Technologien': 'Skills & technologies',
+  'Fähigkeiten': 'Skills',
+  'Backend & Docker': 'Backend & Docker',
+  'Architektur': 'Architecture',
+  'Kontakt': 'Contact',
+  'Kontakt aufnehmen': 'Get in touch',
+  'Tagmodus aktivieren': 'Switch to light mode',
+  'Nachtmodus aktivieren': 'Switch to dark mode',
+  'Nacht': 'Night',
+  'Tag': 'Day',
+  'Auf der Suche nach einer Lehrstelle als Informatiker': 'Looking for an IT apprenticeship',
+  'Logik verstehen.': 'Understand logic.',
+  'Probleme lösen. IT gestalten.': 'Solve problems. Shape IT.',
+  'Ich interessiere mich für moderne Webentwicklung und arbeite mit Angular, Python, FastAPI, Docker und PostgreSQL.': 'I am passionate about modern web development and work with Angular, Python, FastAPI, Docker, and PostgreSQL.',
+  'Projekte entdecken': 'Explore projects',
+  'Architektur ansehen': 'View architecture',
+  'Meine Technologien': 'My technologies',
+  'Frontend': 'Frontend',
+  'Backend': 'Backend',
+  'Datenbank': 'Database',
+  'Betrieb': 'Operations',
+  'Sauberer Code': 'Clean code',
+  'Wartbare Architektur': 'Maintainable architecture',
+  'Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.': 'I explore SOLID principles, Angular standalone components, and well-structured FastAPI controllers.',
+  'Automatisierte Bereitstellung': 'Automated deployment',
+  'Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.': 'Containers with Docker Compose and CI/CD workflows with GitHub Actions.',
+  'Datenverwaltung': 'Data management',
+  'SQL & Datenbanken': 'SQL & databases',
+  'Relationale Datenmodelle mit PostgreSQL, Alembic-Migrationen und SQLAlchemy.': 'Relational data models with PostgreSQL, Alembic migrations, and SQLAlchemy.',
+  'Meine Reddit-Beiträge': 'My Reddit posts',
+  'Meine neuesten Beiträge von u/Timschweizerch.': 'My latest posts from u/Timschweizerch.',
+  'Reddit-Profil ansehen →': 'View Reddit profile →',
+  'Aktualisiert um': 'Updated at',
+  '· automatische Aktualisierung alle 5 Minuten': '· refreshes automatically every 5 minutes',
+  'Beiträge werden direkt von Reddit geladen': 'Posts load directly from Reddit',
+  'Wird geladen ...': 'Loading ...',
+  'Beiträge aktualisieren': 'Refresh posts',
+  'Deine neuesten Reddit-Beiträge werden geladen ...': 'Loading your latest Reddit posts ...',
+  'Für dieses Reddit-Konto wurden keine öffentlichen Beiträge gefunden.': 'No public posts were found for this Reddit account.',
+  'Punkte': 'points',
+  'Kommentare': 'comments',
+  'Aufrufe': 'views',
+  'Auf Reddit ansehen →': 'View on Reddit →',
+  'Meine GitHub-Projekte': 'My GitHub projects',
+  'Meine neuesten öffentlichen Repositories von': 'My latest public repositories from',
+  'GitHub-Profil ansehen →': 'View GitHub profile →',
+  'Repositories werden direkt von GitHub geladen': 'Repositories load directly from GitHub',
+  'Repositories aktualisieren': 'Refresh repositories',
+  'Deine neuesten GitHub-Repositories werden geladen ...': 'Loading your latest GitHub repositories ...',
+  'Für dieses GitHub-Konto wurden keine öffentlichen Repositories gefunden.': 'No public repositories were found for this GitHub account.',
+  'Keine Beschreibung vorhanden.': 'No description provided.',
+  'Sterne': 'stars',
+  'Forks': 'forks',
+  'Aktualisiert am': 'Updated',
+  'Repository ansehen →': 'View repository →',
+  'Ausgewählte Anwendungen': 'Featured applications',
+  'Projekte mit Angular, FastAPI und Datenbankanbindung.': 'Projects featuring Angular, FastAPI, and database integration.',
+  'Ausgewählt': 'Featured',
+  'GitHub-Repository →': 'GitHub repository →',
+  'Meine Fähigkeiten': 'My skills',
+  'Ein Überblick über meine Werkzeuge, Frameworks und Datenbanktechnologien.': 'An overview of my tools, frameworks, and database technologies.',
+  'Softwareentwicklung & Frameworks': 'Software development & frameworks',
+  'Datenbanken & Infrastruktur': 'Databases & infrastructure',
+  'Fortgeschritten': 'Advanced',
+  'Gute Kenntnisse': 'Proficient',
+  'Anwendungsarchitektur & Docker': 'Application architecture & Docker',
+  'Einblick in Backend, Datenbankmodell, Docker-Image und GitHub-Bereitstellung.': 'Explore the backend, database model, Docker image, and GitHub deployment.',
+  'main.py (FastAPI-Backend)': 'main.py (FastAPI backend)',
+  'database.py (PostgreSQL)': 'database.py (PostgreSQL)',
+  'UTF-8 / Für die Bereitstellung konfiguriert': 'UTF-8 / Configured for deployment',
+  'Ich freue mich über den Austausch zu Ausbildungsplätzen, Softwareprojekten und Zusammenarbeit.': 'I would love to hear from you about apprenticeships, software projects, or collaboration.',
+  'Nachricht erfolgreich gesendet!': 'Message sent successfully!',
+  'Vielen Dank! Deine Nachricht wurde per E-Mail zugestellt.': 'Thank you! Your message has been delivered by email.',
+  'Weitere Nachricht senden': 'Send another message',
+  'Dein Name': 'Your name',
+  'z. B. Sarah Connor': 'e.g. Sarah Connor',
+  'E-Mail-Adresse': 'Email address',
+  'name@beispiel.ch': 'name@example.com',
+  'Deine Nachricht': 'Your message',
+  'Hallo Tim, ich würde dich gerne kennenlernen ...': 'Hi Tim, I would love to connect ...',
+  'Wird gesendet ...': 'Sending ...',
+  'Nachricht senden': 'Send message',
+  'Schweiz': 'Switzerland',
+  'Erstellt mit Angular, FastAPI, PostgreSQL und Docker': 'Built with Angular, FastAPI, PostgreSQL, and Docker',
+  'Backend-Anwendungscode (app/main.py)': 'Backend application code (app/main.py)',
+  'Datenbankverbindung und Modell (app/database.py)': 'Database connection and model (app/database.py)',
+  'Bereitstellung mehrerer Container (docker-compose.yml)': 'Multi-container deployment (docker-compose.yml)',
+  'Automatisierte CI/CD-Pipeline (.github/workflows/deploy.yml)': 'Automated CI/CD pipeline (.github/workflows/deploy.yml)',
+  'Aufgaben- und Workflow-Management': 'Task and workflow management',
+  'Eine Workflow-Anwendung mit Statusaktualisierungen, dynamischer Zustandsverwaltung und PostgreSQL-Datenbankanbindung.': 'A workflow application with status updates, dynamic state management, and PostgreSQL persistence.',
+  'Metrik-Dashboard für Microservices': 'Microservice metrics dashboard',
+  'Dashboard zur Systemüberwachung mit asynchronen Daten aus Python-Endpunkten, JWT-Authentifizierung und rollenbasierter Zugriffskontrolle.': 'A system monitoring dashboard with asynchronous Python endpoint data, JWT authentication, and role-based access control.',
+  'Automatisierte CI/CD-Bereitstellung': 'Automated CI/CD deployment',
+  'Cloud & Infrastruktur': 'Cloud & infrastructure',
+  'GitHub-Actions-Ablauf zum Erstellen von Docker-Containern, Testen von FastAPI-Endpunkten und Bereitstellen in der Cloud.': 'A GitHub Actions workflow to build Docker containers, test FastAPI endpoints, and deploy to the cloud.',
+};
+
 function getRedditErrorMessage(error: unknown): string {
   if (
     error instanceof HttpErrorResponse &&
@@ -157,38 +271,38 @@ interface Skill {
   selector: 'app-root',
   imports: [CommonModule, RevealOnScrollDirective],
   template: `
-    <div class="min-h-screen bg-slate-50 text-slate-900 font-sans theme-transition" [class.dark-mode]="isDarkMode()">
+    <div [attr.lang]="language() === 'de' ? 'de' : 'en'" class="min-h-screen bg-slate-50 text-slate-900 font-sans theme-transition" [class.dark-mode]="isDarkMode()">
       <!-- Top Navigation Bar -->
       <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-3 sm:px-6 py-3 sm:py-4">
         <div class="max-w-6xl mx-auto flex flex-wrap items-center gap-x-3 gap-y-3">
           <div class="flex min-w-0 items-center gap-2 sm:gap-3">
             <img src="/profilebild.jpeg" alt="Tim Schweizer" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
             <div class="min-w-0">
-              <span class="font-bold text-base sm:text-lg text-white block leading-tight">Tim Schweizer</span>
-              <span class="text-[10px] sm:text-xs text-indigo-400 font-medium leading-tight">Angehender Informatiklehrling</span>
+              <span class="font-bold text-base sm:text-lg text-white block leading-tight">{{ translate('Tim Schweizer') }}</span>
+              <span class="text-[10px] sm:text-xs text-indigo-400 font-medium leading-tight">{{ translate('Angehender Informatiklehrling') }}</span>
             </div>
           </div>
 
           <!-- Nav Items -->
           <div class="hidden lg:flex lg:mx-auto gap-3 xl:gap-6 text-sm font-medium">
-            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="hover:text-indigo-300 transition-colors">Über mich</button>
-            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="hover:text-indigo-300 transition-colors">Projekte</button>
-            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="hover:text-indigo-300 transition-colors">Fähigkeiten &amp; Technologien</button>
-            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="hover:text-indigo-300 transition-colors">Backend &amp; Docker</button>
-            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="hover:text-indigo-300 transition-colors">Kontakt</button>
+            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="hover:text-indigo-300 transition-colors">{{ translate('Über mich') }}</button>
+            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="hover:text-indigo-300 transition-colors">{{ translate('Projekte') }}</button>
+            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="hover:text-indigo-300 transition-colors">{{ translate('Fähigkeiten & Technologien') }}</button>
+            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="hover:text-indigo-300 transition-colors">{{ translate('Backend & Docker') }}</button>
+            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="hover:text-indigo-300 transition-colors">{{ translate('Kontakt') }}</button>
           </div>
 
           <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
             <a href="#contact" (click)="activeTab.set('contact')" class="px-3 sm:px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/30">
-              <span class="sm:hidden">Kontakt</span>
-              <span class="hidden sm:inline">Kontakt aufnehmen</span>
+              <span class="sm:hidden">{{ translate('Kontakt') }}</span>
+              <span class="hidden sm:inline">{{ translate('Kontakt aufnehmen') }}</span>
             </a>
             <button
               type="button"
               role="switch"
               [attr.aria-checked]="isDarkMode()"
-              [attr.aria-label]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
-              [title]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
+              [attr.aria-label]="translate(isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren')"
+              [title]="translate(isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren')"
               (click)="toggleTheme()"
               class="theme-toggle"
             >
@@ -203,16 +317,23 @@ interface Skill {
                   </svg>
                 </span>
               </span>
-              <span class="theme-toggle-label">{{ isDarkMode() ? 'Nacht' : 'Tag' }}</span>
+              <span class="theme-toggle-label">{{ translate(isDarkMode() ? 'Nacht' : 'Tag') }}</span>
             </button>
+            <button
+              type="button"
+              (click)="toggleLanguage()"
+              [attr.aria-label]="language() === 'de' ? 'Switch language to English' : 'Sprache zu Deutsch wechseln'"
+              [title]="language() === 'de' ? 'Switch to English' : 'Zu Deutsch wechseln'"
+              class="language-toggle"
+            >{{ language() === 'de' ? 'EN' : 'DE' }}</button>
           </div>
 
           <div class="mobile-nav lg:hidden flex w-full flex-wrap gap-2">
-            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="mobile-nav-button">Über mich</button>
-            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="mobile-nav-button">Projekte</button>
-            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="mobile-nav-button">Fähigkeiten</button>
-            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="mobile-nav-button">Architektur</button>
-            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="mobile-nav-button">Kontakt</button>
+            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="mobile-nav-button">{{ translate('Über mich') }}</button>
+            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="mobile-nav-button">{{ translate('Projekte') }}</button>
+            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="mobile-nav-button">{{ translate('Fähigkeiten') }}</button>
+            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="mobile-nav-button">{{ translate('Architektur') }}</button>
+            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="mobile-nav-button">{{ translate('Kontakt') }}</button>
           </div>
         </div>
       </nav>
@@ -228,24 +349,24 @@ interface Skill {
               <div appRevealOnScroll class="flex-1 space-y-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Offen für eine Informatiklehre
+                  {{ translate('Auf der Suche nach einer Lehrstelle als Informatiker') }}
                 </div>
                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight break-words">
-                  Logik verstehen. <br/>
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">Probleme lösen. IT gestalten.</span>
+                  {{ translate('Logik verstehen.') }} <br/>
+                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">{{ translate('Probleme lösen. IT gestalten.') }}</span>
                 </h1>
                 <p class="text-slate-400 text-base md:text-lg leading-relaxed">
-                  Ich interessiere mich für moderne Webentwicklung und arbeite mit Angular, Python, FastAPI, Docker und PostgreSQL.
+                  {{ translate('Ich interessiere mich für moderne Webentwicklung und arbeite mit Angular, Python, FastAPI, Docker und PostgreSQL.') }}
                 </p>
 
                 <div class="flex flex-wrap gap-4 pt-2">
                   <button (click)="activeTab.set('projects')" class="w-full sm:w-auto justify-center px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/25">
-                    <span>Projekte entdecken</span>
+                    <span>{{ translate('Projekte entdecken') }}</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </button>
                   <button (click)="activeTab.set('architecture')" class="w-full sm:w-auto justify-center px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center gap-2">
                     <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    <span>Architektur ansehen</span>
+                    <span>{{ translate('Architektur ansehen') }}</span>
                   </button>
                 </div>
               </div>
@@ -253,35 +374,35 @@ interface Skill {
               <!-- Tech Badge Stack Visual -->
               <div appRevealOnScroll class="w-full md:w-80 min-w-0 bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Meine Technologien</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">{{ translate('Meine Technologien') }}</h3>
                 <div class="space-y-3">
                   <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-red-500"></span>
                       <span class="text-sm font-semibold text-slate-200 break-words">Angular 18+</span>
                     </div>
-                    <span class="text-xs text-slate-400">Frontend</span>
+                    <span class="text-xs text-slate-400">{{ translate('Frontend') }}</span>
                   </div>
                   <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                       <span class="text-sm font-semibold text-slate-200">FastAPI (Python)</span>
                     </div>
-                    <span class="text-xs text-slate-400">Backend</span>
+                    <span class="text-xs text-slate-400">{{ translate('Backend') }}</span>
                   </div>
                   <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-blue-500"></span>
                       <span class="text-sm font-semibold text-slate-200">PostgreSQL</span>
                     </div>
-                    <span class="text-xs text-slate-400">Datenbank</span>
+                    <span class="text-xs text-slate-400">{{ translate('Datenbank') }}</span>
                   </div>
                   <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
                       <span class="text-sm font-semibold text-slate-200">Docker & Compose</span>
                     </div>
-                    <span class="text-xs text-slate-400">Betrieb</span>
+                    <span class="text-xs text-slate-400">{{ translate('Betrieb') }}</span>
                   </div>
                   <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
                     <div class="flex min-w-0 items-center gap-3">
@@ -297,19 +418,19 @@ interface Skill {
             <!-- Quick Stats / Highlights -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
               <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-indigo-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Sauberer Code</div>
-                <h3 class="text-lg font-bold text-white mb-2">Wartbare Architektur</h3>
-                <p class="text-sm text-slate-400">Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.</p>
+                <div class="text-indigo-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">{{ translate('Sauberer Code') }}</div>
+                <h3 class="text-lg font-bold text-white mb-2">{{ translate('Wartbare Architektur') }}</h3>
+                <p class="text-sm text-slate-400">{{ translate('Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.') }}</p>
               </div>
               <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
                 <div class="text-cyan-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">DevOps</div>
-                <h3 class="text-lg font-bold text-white mb-2">Automatisierte Bereitstellung</h3>
-                <p class="text-sm text-slate-400">Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.</p>
+                <h3 class="text-lg font-bold text-white mb-2">{{ translate('Automatisierte Bereitstellung') }}</h3>
+                <p class="text-sm text-slate-400">{{ translate('Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.') }}</p>
               </div>
               <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-emerald-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Datenverwaltung</div>
-                <h3 class="text-lg font-bold text-white mb-2">SQL &amp; Datenbanken</h3>
-                <p class="text-sm text-slate-400">Relationale Datenmodelle mit PostgreSQL, Alembic-Migrationen und SQLAlchemy.</p>
+                <div class="text-emerald-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">{{ translate('Datenverwaltung') }}</div>
+                <h3 class="text-lg font-bold text-white mb-2">{{ translate('SQL &amp; Datenbanken') }}</h3>
+                <p class="text-sm text-slate-400">{{ translate('Relationale Datenmodelle mit PostgreSQL, Alembic-Migrationen und SQLAlchemy.') }}</p>
               </div>
             </div>
 
@@ -317,35 +438,35 @@ interface Skill {
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <p class="text-orange-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Reddit</p>
-                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">Meine Reddit-Beiträge</h2>
-                  <p class="text-slate-400 text-sm mt-1">Meine neuesten Beiträge von u/Timschweizerch.</p>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">{{ translate('Meine Reddit-Beiträge') }}</h2>
+                  <p class="text-slate-400 text-sm mt-1">{{ translate('Meine neuesten Beiträge von u/Timschweizerch.') }}</p>
                 </div>
                 <a href="https://www.reddit.com/user/Timschweizerch/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-sm font-semibold transition-colors">
-                  Reddit-Profil ansehen &rarr;
+                  {{ translate('Reddit-Profil ansehen &rarr;') }}
                 </a>
               </div>
 
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <p class="text-xs text-slate-500" aria-live="polite">
                   @if (redditLastUpdated()) {
-                    Aktualisiert um {{ redditLastUpdated() | date:'shortTime' }} · automatische Aktualisierung alle 5 Minuten
+                    {{ translate('Aktualisiert um') }} {{ redditLastUpdated() | date:'shortTime':undefined:localeId() }} {{ translate('· automatische Aktualisierung alle 5 Minuten') }}
                   } @else {
-                    Beiträge werden direkt von Reddit geladen
+                    {{ translate('Beiträge werden direkt von Reddit geladen') }}
                   }
                 </p>
                 <button type="button" (click)="refreshRedditPosts()" [disabled]="redditLoading()" class="px-3 py-2 text-xs font-semibold text-slate-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 rounded-lg">
-                  {{ redditLoading() ? 'Wird geladen ...' : 'Beiträge aktualisieren' }}
+                  {{ translate(redditLoading() ? 'Wird geladen ...' : 'Beiträge aktualisieren') }}
                 </button>
               </div>
 
               @if (redditError()) {
                 <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
-                  {{ redditError() }}
+                  {{ translate(redditError()) }}
                 </div>
               } @else if (redditLoading() && redditPosts().length === 0) {
-                <p class="text-sm text-slate-400" role="status">Deine neuesten Reddit-Beiträge werden geladen ...</p>
+                <p class="text-sm text-slate-400" role="status">{{ translate('Deine neuesten Reddit-Beiträge werden geladen ...') }}</p>
               } @else if (redditPosts().length === 0) {
-                <p class="text-sm text-slate-400">Für dieses Reddit-Konto wurden keine öffentlichen Beiträge gefunden.</p>
+                <p class="text-sm text-slate-400">{{ translate('Für dieses Reddit-Konto wurden keine öffentlichen Beiträge gefunden.') }}</p>
               }
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -353,10 +474,10 @@ interface Skill {
                   <article class="bg-slate-900/70 border border-slate-700 rounded-xl p-5">
                     <div class="flex flex-wrap items-center gap-2 mb-3">
                       <span class="text-xs font-semibold px-2.5 py-1 rounded bg-orange-500/10 text-orange-300 border border-orange-500/20">{{ post.subreddit }}</span>
-                      <span class="text-xs text-slate-400">{{ post.score | number }} Punkte</span>
-                      <span class="text-xs text-slate-400">{{ post.numComments | number }} Kommentare</span>
+                      <span class="text-xs text-slate-400">{{ post.score | number:undefined:localeId() }} {{ translate('Punkte') }}</span>
+                      <span class="text-xs text-slate-400">{{ post.numComments | number:undefined:localeId() }} {{ translate('Kommentare') }}</span>
                       @if (post.viewCount !== null) {
-                        <span class="text-xs text-slate-400">{{ post.viewCount | number }} Aufrufe</span>
+                        <span class="text-xs text-slate-400">{{ post.viewCount | number:undefined:localeId() }} {{ translate('Aufrufe') }}</span>
                       }
                     </div>
                     <h3 class="text-lg font-semibold text-white mb-2">{{ post.title }}</h3>
@@ -364,9 +485,9 @@ interface Skill {
                       <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{{ post.selftext }}</p>
                     }
                     <div class="flex items-center justify-between gap-4 mt-4">
-                      <span class="text-xs text-slate-500">{{ post.createdUtc * 1000 | date:'mediumDate' }}</span>
+                      <span class="text-xs text-slate-500">{{ post.createdUtc * 1000 | date:'mediumDate':undefined:localeId() }}</span>
                       <a [href]="post.permalink" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-orange-400 hover:text-orange-300">
-                        Auf Reddit ansehen &rarr;
+                        {{ translate('Auf Reddit ansehen &rarr;') }}
                       </a>
                     </div>
                   </article>
@@ -378,52 +499,52 @@ interface Skill {
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <p class="text-slate-300 mb-2 font-mono text-xs uppercase tracking-wider font-bold">GitHub</p>
-                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">Meine GitHub-Projekte</h2>
-                  <p class="text-slate-400 text-sm mt-1">Meine neuesten öffentlichen Repositories von {{ githubUsername }}.</p>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">{{ translate('Meine GitHub-Projekte') }}</h2>
+                  <p class="text-slate-400 text-sm mt-1">{{ translate('Meine neuesten öffentlichen Repositories von') }} {{ githubUsername }}.</p>
                 </div>
                 <a href="https://github.com/{{ githubUsername }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors">
-                  GitHub-Profil ansehen &rarr;
+                  {{ translate('GitHub-Profil ansehen &rarr;') }}
                 </a>
               </div>
 
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <p class="text-xs text-slate-500" aria-live="polite">
                   @if (githubLastUpdated()) {
-                    Aktualisiert um {{ githubLastUpdated() | date:'shortTime' }} · automatische Aktualisierung alle 5 Minuten
+                    {{ translate('Aktualisiert um') }} {{ githubLastUpdated() | date:'shortTime':undefined:localeId() }} {{ translate('· automatische Aktualisierung alle 5 Minuten') }}
                   } @else {
-                    Repositories werden direkt von GitHub geladen
+                    {{ translate('Repositories werden direkt von GitHub geladen') }}
                   }
                 </p>
                 <button type="button" (click)="refreshGitHubRepositories()" [disabled]="githubLoading()" class="px-3 py-2 text-xs font-semibold text-slate-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 rounded-lg">
-                  {{ githubLoading() ? 'Wird geladen ...' : 'Repositories aktualisieren' }}
+                  {{ translate(githubLoading() ? 'Wird geladen ...' : 'Repositories aktualisieren') }}
                 </button>
               </div>
 
               @if (githubError()) {
                 <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
-                  {{ githubError() }}
+                  {{ translate(githubError()) }}
                 </div>
               } @else if (githubLoading() && githubRepositories().length === 0) {
-                <p class="text-sm text-slate-400" role="status">Deine neuesten GitHub-Repositories werden geladen ...</p>
+                <p class="text-sm text-slate-400" role="status">{{ translate('Deine neuesten GitHub-Repositories werden geladen ...') }}</p>
               } @else if (githubRepositories().length === 0) {
-                <p class="text-sm text-slate-400">Für dieses GitHub-Konto wurden keine öffentlichen Repositories gefunden.</p>
+                <p class="text-sm text-slate-400">{{ translate('Für dieses GitHub-Konto wurden keine öffentlichen Repositories gefunden.') }}</p>
               }
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @for (repository of githubRepositories(); track repository.id) {
                   <article class="bg-slate-900/70 border border-slate-700 rounded-xl p-5">
                     <h3 class="text-lg font-semibold text-white mb-2">{{ repository.name }}</h3>
-                    <p class="text-sm text-slate-300 leading-relaxed min-h-10">{{ repository.description || 'Keine Beschreibung vorhanden.' }}</p>
+                    <p class="text-sm text-slate-300 leading-relaxed min-h-10">{{ repository.description || translate('Keine Beschreibung vorhanden.') }}</p>
                     <div class="flex flex-wrap items-center gap-3 mt-4 text-xs text-slate-400">
                       @if (repository.language) {
                         <span class="px-2 py-1 rounded bg-slate-800">{{ repository.language }}</span>
                       }
-                      <span>{{ repository.stars | number }} Sterne</span>
-                      <span>{{ repository.forks | number }} Forks</span>
-                      <span>Aktualisiert am {{ repository.updatedAt | date:'mediumDate' }}</span>
+                      <span>{{ repository.stars | number:undefined:localeId() }} {{ translate('Sterne') }}</span>
+                      <span>{{ repository.forks | number:undefined:localeId() }} {{ translate('Forks') }}</span>
+                      <span>{{ translate('Aktualisiert am') }} {{ repository.updatedAt | date:'mediumDate':undefined:localeId() }}</span>
                     </div>
                     <a [href]="repository.htmlUrl" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 text-sm font-semibold text-indigo-400 hover:text-indigo-300">
-                      Repository ansehen &rarr;
+                      {{ translate('Repository ansehen &rarr;') }}
                     </a>
                   </article>
                 }
@@ -436,8 +557,8 @@ interface Skill {
         @if (activeTab() === 'projects') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Ausgewählte Anwendungen</h2>
-              <p class="text-slate-400 text-sm mt-1">Projekte mit Angular, FastAPI und Datenbankanbindung.</p>
+              <h2 class="text-2xl font-bold text-white">{{ translate('Ausgewählte Anwendungen') }}</h2>
+              <p class="text-slate-400 text-sm mt-1">{{ translate('Projekte mit Angular, FastAPI und Datenbankanbindung.') }}</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -446,14 +567,14 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
                       <span class="text-xs font-semibold px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                        {{ proj.category }}
+                        {{ translate(proj.category) }}
                       </span>
                       @if (proj.highlight) {
-                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">Ausgewählt</span>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">{{ translate('Ausgewählt') }}</span>
                       }
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">{{ proj.title }}</h3>
-                    <p class="text-slate-300 text-sm mb-4 leading-relaxed">{{ proj.description }}</p>
+                    <h3 class="text-xl font-bold text-white mb-2">{{ translate(proj.title) }}</h3>
+                    <p class="text-slate-300 text-sm mb-4 leading-relaxed">{{ translate(proj.description) }}</p>
                   </div>
 
                   <div>
@@ -466,7 +587,7 @@ interface Skill {
                     </div>
                     <div class="flex items-center gap-4 text-sm font-semibold">
                       <a [href]="proj.githubUrl" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
-                        GitHub-Repository &rarr;
+                        {{ translate('GitHub-Repository &rarr;') }}
                       </a>
                     </div>
                   </div>
@@ -480,8 +601,8 @@ interface Skill {
         @if (activeTab() === 'skills') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Meine Fähigkeiten</h2>
-              <p class="text-slate-400 text-sm mt-1">Ein Überblick über meine Werkzeuge, Frameworks und Datenbanktechnologien.</p>
+              <h2 class="text-2xl font-bold text-white">{{ translate('Meine Fähigkeiten') }}</h2>
+              <p class="text-slate-400 text-sm mt-1">{{ translate('Ein Überblick über meine Werkzeuge, Frameworks und Datenbanktechnologien.') }}</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -489,14 +610,14 @@ interface Skill {
               <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <h3 class="text-lg font-bold text-indigo-400 flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                  Softwareentwicklung &amp; Frameworks
+                  {{ translate('Softwareentwicklung &amp; Frameworks') }}
                 </h3>
 
                 <div class="space-y-4">
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Angular & Angular Material</span>
-                      <span class="text-indigo-400">Fortgeschritten</span>
+                      <span class="text-indigo-400">{{ translate('Fortgeschritten') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-indigo-500 h-2 rounded-full" style="width: 90%"></div>
@@ -506,7 +627,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Python & FastAPI / Pydantic</span>
-                      <span class="text-emerald-400">Fortgeschritten</span>
+                      <span class="text-emerald-400">{{ translate('Fortgeschritten') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-500 h-2 rounded-full" style="width: 88%"></div>
@@ -516,7 +637,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">TypeScript & RxJS / Signals</span>
-                      <span class="text-indigo-400">Gute Kenntnisse</span>
+                      <span class="text-indigo-400">{{ translate('Gute Kenntnisse') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-indigo-400 h-2 rounded-full" style="width: 85%"></div>
@@ -526,7 +647,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">RESTful API Design & OpenAPI</span>
-                      <span class="text-emerald-400">Fortgeschritten</span>
+                      <span class="text-emerald-400">{{ translate('Fortgeschritten') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-400 h-2 rounded-full" style="width: 92%"></div>
@@ -539,14 +660,14 @@ interface Skill {
               <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
                 <h3 class="text-lg font-bold text-cyan-400 flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
-                  Datenbanken &amp; Infrastruktur
+                  {{ translate('Datenbanken &amp; Infrastruktur') }}
                 </h3>
 
                 <div class="space-y-4">
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">PostgreSQL & SQL Optimization</span>
-                      <span class="text-cyan-400">Gute Kenntnisse</span>
+                      <span class="text-cyan-400">{{ translate('Gute Kenntnisse') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-cyan-500 h-2 rounded-full" style="width: 82%"></div>
@@ -556,7 +677,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Docker & Docker Compose</span>
-                      <span class="text-cyan-400">Gute Kenntnisse</span>
+                      <span class="text-cyan-400">{{ translate('Gute Kenntnisse') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-cyan-400 h-2 rounded-full" style="width: 80%"></div>
@@ -566,7 +687,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Git & GitHub Actions CI/CD</span>
-                      <span class="text-purple-400">Gute Kenntnisse</span>
+                      <span class="text-purple-400">{{ translate('Gute Kenntnisse') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-purple-500 h-2 rounded-full" style="width: 85%"></div>
@@ -576,7 +697,7 @@ interface Skill {
                   <div>
                     <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">SQLAlchemy & Database Migrations</span>
-                      <span class="text-emerald-400">Gute Kenntnisse</span>
+                      <span class="text-emerald-400">{{ translate('Gute Kenntnisse') }}</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2">
                       <div class="bg-emerald-400 h-2 rounded-full" style="width: 78%"></div>
@@ -592,17 +713,17 @@ interface Skill {
         @if (activeTab() === 'architecture') {
           <section class="space-y-8">
             <div>
-              <h2 class="text-2xl font-bold text-white">Anwendungsarchitektur &amp; Docker</h2>
-              <p class="text-slate-400 text-sm mt-1">Einblick in Backend, Datenbankmodell, Docker-Image und GitHub-Bereitstellung.</p>
+              <h2 class="text-2xl font-bold text-white">{{ translate('Anwendungsarchitektur &amp; Docker') }}</h2>
+              <p class="text-slate-400 text-sm mt-1">{{ translate('Einblick in Backend, Datenbankmodell, Docker-Image und GitHub-Bereitstellung.') }}</p>
             </div>
 
             <!-- Code Viewer Selector -->
             <div class="flex gap-2 overflow-x-auto pb-2 border-b border-slate-800">
               <button (click)="selectedCodeFile.set('fastapi')" [class.border-indigo-500]="selectedCodeFile() === 'fastapi'" [class.text-indigo-400]="selectedCodeFile() === 'fastapi'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
-                main.py (FastAPI-Backend)
+                {{ translate('main.py (FastAPI-Backend)') }}
               </button>
               <button (click)="selectedCodeFile.set('database')" [class.border-indigo-500]="selectedCodeFile() === 'database'" [class.text-indigo-400]="selectedCodeFile() === 'database'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
-                database.py (PostgreSQL)
+                {{ translate('database.py (PostgreSQL)') }}
               </button>
               <button (click)="selectedCodeFile.set('docker')" [class.border-indigo-500]="selectedCodeFile() === 'docker'" [class.text-indigo-400]="selectedCodeFile() === 'docker'" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-white transition-all whitespace-nowrap">
                 docker-compose.yml
@@ -615,8 +736,8 @@ interface Skill {
             <!-- Code Display Block -->
             <div appRevealOnScroll class="bg-slate-950 border border-slate-800 rounded-2xl p-5 font-mono text-xs md:text-sm text-slate-300 overflow-x-auto shadow-2xl relative">
               <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-800/80 text-slate-500">
-                <span class="text-xs text-indigo-400 font-semibold">{{ getFileTitle(selectedCodeFile()) }}</span>
-                <span class="text-xs">UTF-8 / Für die Bereitstellung konfiguriert</span>
+                <span class="text-xs text-indigo-400 font-semibold">{{ translate(getFileTitle(selectedCodeFile())) }}</span>
+                <span class="text-xs">{{ translate('UTF-8 / Für die Bereitstellung konfiguriert') }}</span>
               </div>
               <pre class="leading-relaxed"><code>{{ getCodeSnippet(selectedCodeFile()) }}</code></pre>
             </div>
@@ -627,40 +748,40 @@ interface Skill {
         @if (activeTab() === 'contact') {
           <section class="max-w-2xl mx-auto space-y-8">
             <div class="text-center">
-              <h2 class="text-3xl font-bold text-white">Kontakt</h2>
-              <p class="text-slate-400 text-sm mt-2">Ich freue mich über den Austausch zu Ausbildungsplätzen, Softwareprojekten und Zusammenarbeit.</p>
+              <h2 class="text-3xl font-bold text-white">{{ translate('Kontakt') }}</h2>
+              <p class="text-slate-400 text-sm mt-2">{{ translate('Ich freue mich über den Austausch zu Ausbildungsplätzen, Softwareprojekten und Zusammenarbeit.') }}</p>
             </div>
 
             <div appRevealOnScroll class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 sm:p-8 space-y-6">
               @if (formSubmitted()) {
                 <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center space-y-2">
                   <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold">✓</div>
-                  <h3 class="text-lg font-bold text-white">Nachricht erfolgreich gesendet!</h3>
-                  <p class="text-sm text-slate-300">Vielen Dank! Deine Nachricht wurde per E-Mail zugestellt.</p>
-                  <button (click)="formSubmitted.set(false)" class="mt-4 text-xs font-semibold text-indigo-400 hover:underline">Weitere Nachricht senden</button>
+                  <h3 class="text-lg font-bold text-white">{{ translate('Nachricht erfolgreich gesendet!') }}</h3>
+                  <p class="text-sm text-slate-300">{{ translate('Vielen Dank! Deine Nachricht wurde per E-Mail zugestellt.') }}</p>
+                  <button (click)="formSubmitted.set(false)" class="mt-4 text-xs font-semibold text-indigo-400 hover:underline">{{ translate('Weitere Nachricht senden') }}</button>
                 </div>
               } @else {
                 <form (submit)="handleSubmit($event)" class="space-y-4">
                   @if (contactError()) {
-                    <p class="text-sm text-red-300" role="alert">{{ contactError() }}</p>
+                    <p class="text-sm text-red-300" role="alert">{{ translate(contactError()) }}</p>
                   }
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Dein Name</label>
-                    <input name="name" type="text" required maxlength="100" placeholder="z. B. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <label class="block text-xs font-medium text-slate-300 mb-1">{{ translate('Dein Name') }}</label>
+                    <input name="name" type="text" required maxlength="100" [placeholder]="translate('z. B. Sarah Connor')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">E-Mail-Adresse</label>
-                    <input name="email" type="email" required maxlength="254" placeholder="name@beispiel.ch" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <label class="block text-xs font-medium text-slate-300 mb-1">{{ translate('E-Mail-Adresse') }}</label>
+                    <input name="email" type="email" required maxlength="254" [placeholder]="translate('name@beispiel.ch')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Deine Nachricht</label>
-                    <textarea name="message" rows="4" required maxlength="5000" placeholder="Hallo Tim, ich würde dich gerne kennenlernen ..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">{{ translate('Deine Nachricht') }}</label>
+                    <textarea name="message" rows="4" required maxlength="5000" [placeholder]="translate('Hallo Tim, ich würde dich gerne kennenlernen ...')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
                   </div>
 
                   <button type="submit" [disabled]="contactSending()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/25">
-                    {{ contactSending() ? 'Wird gesendet ...' : 'Nachricht senden' }}
+                    {{ translate(contactSending() ? 'Wird gesendet ...' : 'Nachricht senden') }}
                   </button>
                 </form>
               }
@@ -672,7 +793,7 @@ interface Skill {
                 </div>
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  <span>Schweiz</span>
+                  <span>{{ translate('Schweiz') }}</span>
                 </div>
               </div>
             </div>
@@ -685,7 +806,7 @@ interface Skill {
       <footer class="mt-20 border-t border-slate-800 py-8 text-center text-xs text-slate-500">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>© {{ currentYear }} Tim Schweizer — Portfolio</p>
-          <p class="font-mono text-slate-600">Erstellt mit Angular, FastAPI, PostgreSQL und Docker</p>
+          <p class="font-mono text-slate-600">{{ translate('Erstellt mit Angular, FastAPI, PostgreSQL und Docker') }}</p>
         </div>
       </footer>
     </div>
@@ -702,6 +823,8 @@ export class App {
   contactError = signal('');
   currentYear = new Date().getFullYear();
   isDarkMode = signal(false);
+  language = signal<'de' | 'en'>('de');
+  localeId = () => this.language() === 'de' ? 'de-DE' : 'en-US';
   redditPosts = signal<RedditPost[]>([]);
   redditLoading = signal(false);
   redditError = signal('');
@@ -715,6 +838,7 @@ export class App {
   constructor() {
     if (typeof window !== 'undefined') {
       this.isDarkMode.set(window.localStorage.getItem('portfolio-theme') === 'dark');
+      this.language.set(window.localStorage.getItem('portfolio-language') === 'en' ? 'en' : 'de');
     }
     this.refreshRedditPosts();
     this.refreshGitHubRepositories();
@@ -760,6 +884,32 @@ export class App {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('portfolio-theme', nextIsDarkMode ? 'dark' : 'light');
     }
+  }
+
+  toggleLanguage() {
+    const nextLanguage = this.language() === 'de' ? 'en' : 'de';
+    this.language.set(nextLanguage);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('portfolio-language', nextLanguage);
+    }
+  }
+
+  translate(text: string): string {
+    if (this.language() === 'de') {
+      return text;
+    }
+
+    const dynamicStatus = text.match(/^(Die Anmeldung bei Reddit ist fehlgeschlagen|Die Reddit-API ist nicht erreichbar|Die GitHub-API ist nicht erreichbar) \(HTTP (\d+)\)\.$/);
+    if (dynamicStatus) {
+      const subject = dynamicStatus[1] === 'Die Anmeldung bei Reddit ist fehlgeschlagen'
+        ? 'Reddit sign-in failed'
+        : dynamicStatus[1] === 'Die Reddit-API ist nicht erreichbar'
+          ? 'The Reddit API is unavailable'
+          : 'The GitHub API is unavailable';
+      return `${subject} (HTTP ${dynamicStatus[2]}).`;
+    }
+
+    return englishTranslations[text] ?? text;
   }
 
   refreshRedditPosts() {
