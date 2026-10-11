@@ -78,6 +78,24 @@ const englishTranslations: Record<string, string> = {
   'Sauberer Code': 'Clean code',
   'Wartbare Architektur': 'Maintainable architecture',
   'Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.': 'I explore SOLID principles, Angular standalone components, and well-structured FastAPI controllers.',
+  'Technische Stärken': 'Technical strengths',
+  'Persönliche Stärken': 'Personal strengths',
+  'KI': 'AI',
+  'Ich nutze KI als Unterstützung beim Lernen und Entwickeln.': 'I use AI to support my learning and development.',
+  'Zusammenhänge schnell verstehen': 'Quickly understanding connections',
+  'Ich erfasse neue Zusammenhänge schnell und kann Informationen einordnen.': 'I quickly grasp new connections and put information into context.',
+  'Allgemeines Computerfachwissen': 'General computer knowledge',
+  'Ich bringe ein breites Verständnis für Computer, Betriebssysteme und digitale Technologien mit.': 'I have a broad understanding of computers, operating systems, and digital technologies.',
+  'Kenntnisse verschiedener moderner Software-Tools': 'Knowledge of various modern software tools',
+  'Ich arbeite mit unterschiedlichen Entwicklungs-, Kollaborations- und Produktivitätstools.': 'I work with a range of development, collaboration, and productivity tools.',
+  'Teamfähigkeit': 'Teamwork',
+  'Ich tausche mich offen aus und arbeite auf gemeinsame Ziele hin.': 'I communicate openly and work toward shared goals.',
+  'Ausdauer': 'Perseverance',
+  'Ich bleibe auch bei anspruchsvollen Aufgaben dran.': 'I stay focused even when tasks are challenging.',
+  'Neugier': 'Curiosity',
+  'Ich probiere gern Neues aus und möchte verstehen, wie es funktioniert.': 'I enjoy exploring new things and understanding how they work.',
+  'Eigeninitiative': 'Initiative',
+  'Ich bringe eigene Ideen ein und setze Aufgaben selbstständig in Gang.': 'I contribute my own ideas and take initiative to get tasks moving.',
   'Automatisierte Bereitstellung': 'Automated deployment',
   'Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.': 'Containers with Docker Compose and CI/CD workflows with GitHub Actions.',
   'Datenverwaltung': 'Data management',
@@ -415,24 +433,52 @@ interface Skill {
               </div>
             </div>
 
-            <!-- Quick Stats / Highlights -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-indigo-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">{{ translate('Sauberer Code') }}</div>
-                <h3 class="text-lg font-bold text-white mb-2">{{ translate('Wartbare Architektur') }}</h3>
-                <p class="text-sm text-slate-400">{{ translate('Ich beschäftige mich mit SOLID-Prinzipien, Angular-Standalone-Komponenten und übersichtlichen FastAPI-Controllern.') }}</p>
+            <section class="pt-6">
+              <div class="grid grid-cols-1 gap-8">
+                <section class="space-y-4">
+                  <h2 class="text-2xl font-bold text-white">{{ translate('Technische Stärken') }}</h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('KI') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich nutze KI als Unterstützung beim Lernen und Entwickeln.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Zusammenhänge schnell verstehen') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich erfasse neue Zusammenhänge schnell und kann Informationen einordnen.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Allgemeines Computerfachwissen') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich bringe ein breites Verständnis für Computer, Betriebssysteme und digitale Technologien mit.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Kenntnisse verschiedener moderner Software-Tools') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich arbeite mit unterschiedlichen Entwicklungs-, Kollaborations- und Produktivitätstools.') }}</p>
+                    </article>
+                  </div>
+                </section>
+                <section class="space-y-4">
+                  <h2 class="text-2xl font-bold text-white">{{ translate('Persönliche Stärken') }}</h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Teamfähigkeit') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich tausche mich offen aus und arbeite auf gemeinsame Ziele hin.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Ausdauer') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich bleibe auch bei anspruchsvollen Aufgaben dran.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Neugier') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich probiere gern Neues aus und möchte verstehen, wie es funktioniert.') }}</p>
+                    </article>
+                    <article appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl">
+                      <h3 class="text-lg font-bold text-white mb-2">{{ translate('Eigeninitiative') }}</h3>
+                      <p class="text-sm text-slate-400">{{ translate('Ich bringe eigene Ideen ein und setze Aufgaben selbstständig in Gang.') }}</p>
+                    </article>
+                  </div>
+                </section>
               </div>
-              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-cyan-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">DevOps</div>
-                <h3 class="text-lg font-bold text-white mb-2">{{ translate('Automatisierte Bereitstellung') }}</h3>
-                <p class="text-sm text-slate-400">{{ translate('Container mit Docker Compose und CI/CD-Abläufe mit GitHub Actions.') }}</p>
-              </div>
-              <div appRevealOnScroll class="bg-slate-800/40 border border-slate-800 p-6 rounded-2xl">
-                <div class="text-emerald-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">{{ translate('Datenverwaltung') }}</div>
-                <h3 class="text-lg font-bold text-white mb-2">{{ translate('SQL &amp; Datenbanken') }}</h3>
-                <p class="text-sm text-slate-400">{{ translate('Relationale Datenmodelle mit PostgreSQL, Alembic-Migrationen und SQLAlchemy.') }}</p>
-              </div>
-            </div>
+            </section>
 
             <section appRevealOnScroll class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-5">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
