@@ -256,6 +256,28 @@ button.text-white,
   font-weight: 600;
 }
 
+.language-toggle {
+  min-width: 2.5rem;
+  border: 1px solid rgb(148 163 184 / 35%);
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  color: #e2e8f0;
+  background: rgb(51 65 85 / 70%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.language-toggle:hover {
+  border-color: rgb(129 140 248 / 70%);
+  background: rgb(71 85 105 / 85%);
+}
+
+.language-toggle:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 3px;
+}
+
 @media (max-width: 420px) {
   .theme-toggle-label {
     display: none;
