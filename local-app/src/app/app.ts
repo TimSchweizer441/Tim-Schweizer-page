@@ -74,6 +74,27 @@ function getGitHubErrorMessage(error: unknown): string {
   return 'GitHub-Repositories konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
 }
 
+function getContactErrorMessage(error: unknown): string {
+  if (
+    error instanceof HttpErrorResponse &&
+    typeof error.error === 'object' &&
+    error.error !== null &&
+    'error' in error.error &&
+    typeof error.error.error === 'string'
+  ) {
+    switch (error.error.error) {
+      case 'email_not_configured':
+        return 'Der E-Mail-Versand ist noch nicht eingerichtet. Bitte trage die Gmail-SMTP-Daten in local-app/.env ein.';
+      case 'invalid_contact':
+        return 'Bitte überprüfe deine Angaben und versuche es erneut.';
+      case 'email_delivery_failed':
+        return 'Die E-Mail konnte nicht zugestellt werden. Bitte versuche es später erneut.';
+    }
+  }
+
+  return 'Die Nachricht konnte nicht gesendet werden. Bitte überprüfe deine Verbindung und versuche es erneut.';
+}
+
 @Directive({
   selector: '[appRevealOnScroll]',
   standalone: true,
@@ -138,18 +159,18 @@ interface Skill {
   template: `
     <div class="min-h-screen bg-slate-50 text-slate-900 font-sans theme-transition" [class.dark-mode]="isDarkMode()">
       <!-- Top Navigation Bar -->
-      <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <img src="/profilebild.jpeg" alt="Tim Schweizer" class="w-12 h-12 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
-            <div>
-              <span class="font-bold text-lg text-white block leading-none">Tim Schweizer</span>
-              <span class="text-xs text-indigo-400 font-medium">Angehender Informatiklehrling</span>
+      <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-3 sm:px-6 py-3 sm:py-4">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center gap-x-3 gap-y-3">
+          <div class="flex min-w-0 items-center gap-2 sm:gap-3">
+            <img src="/profilebild.jpeg" alt="Tim Schweizer" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
+            <div class="min-w-0">
+              <span class="font-bold text-base sm:text-lg text-white block leading-tight">Tim Schweizer</span>
+              <span class="text-[10px] sm:text-xs text-indigo-400 font-medium leading-tight">Angehender Informatiklehrling</span>
             </div>
           </div>
 
           <!-- Nav Items -->
-          <div class="hidden md:flex gap-6 text-sm font-medium">
+          <div class="hidden lg:flex lg:mx-auto gap-3 xl:gap-6 text-sm font-medium">
             <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="hover:text-indigo-300 transition-colors">Über mich</button>
             <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="hover:text-indigo-300 transition-colors">Projekte</button>
             <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="hover:text-indigo-300 transition-colors">Fähigkeiten &amp; Technologien</button>
@@ -157,36 +178,47 @@ interface Skill {
             <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="hover:text-indigo-300 transition-colors">Kontakt</button>
           </div>
 
-          <a href="#contact" (click)="activeTab.set('contact')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition-all shadow-md shadow-indigo-600/30">
-            Kontakt aufnehmen
-          </a>
-          <button
-            type="button"
-            role="switch"
-            [attr.aria-checked]="isDarkMode()"
-            [attr.aria-label]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
-            [title]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
-            (click)="toggleTheme()"
-            class="theme-toggle"
-          >
-            <span class="theme-toggle-track" [class.is-dark]="isDarkMode()">
-              <span class="theme-toggle-thumb">
-                <svg class="theme-toggle-sun" [class.is-hidden]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <circle cx="12" cy="12" r="4"></circle>
-                  <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
-                </svg>
-                <svg class="theme-toggle-moon" [class.is-visible]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"></path>
-                </svg>
+          <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <a href="#contact" (click)="activeTab.set('contact')" class="px-3 sm:px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/30">
+              <span class="sm:hidden">Kontakt</span>
+              <span class="hidden sm:inline">Kontakt aufnehmen</span>
+            </a>
+            <button
+              type="button"
+              role="switch"
+              [attr.aria-checked]="isDarkMode()"
+              [attr.aria-label]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
+              [title]="isDarkMode() ? 'Tagmodus aktivieren' : 'Nachtmodus aktivieren'"
+              (click)="toggleTheme()"
+              class="theme-toggle"
+            >
+              <span class="theme-toggle-track" [class.is-dark]="isDarkMode()">
+                <span class="theme-toggle-thumb">
+                  <svg class="theme-toggle-sun" [class.is-hidden]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                  </svg>
+                  <svg class="theme-toggle-moon" [class.is-visible]="isDarkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                    <path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"></path>
+                  </svg>
+                </span>
               </span>
-            </span>
-            <span class="theme-toggle-label">{{ isDarkMode() ? 'Nacht' : 'Tag' }}</span>
-          </button>
+              <span class="theme-toggle-label">{{ isDarkMode() ? 'Nacht' : 'Tag' }}</span>
+            </button>
+          </div>
+
+          <div class="mobile-nav lg:hidden flex w-full flex-wrap gap-2">
+            <button (click)="activeTab.set('overview')" [class.text-indigo-400]="activeTab() === 'overview'" class="mobile-nav-button">Über mich</button>
+            <button (click)="activeTab.set('projects')" [class.text-indigo-400]="activeTab() === 'projects'" class="mobile-nav-button">Projekte</button>
+            <button (click)="activeTab.set('skills')" [class.text-indigo-400]="activeTab() === 'skills'" class="mobile-nav-button">Fähigkeiten</button>
+            <button (click)="activeTab.set('architecture')" [class.text-indigo-400]="activeTab() === 'architecture'" class="mobile-nav-button">Architektur</button>
+            <button (click)="activeTab.set('contact')" [class.text-indigo-400]="activeTab() === 'contact'" class="mobile-nav-button">Kontakt</button>
+          </div>
         </div>
       </nav>
 
       <!-- Main Content Container -->
-      <main class="max-w-6xl mx-auto px-6 py-10">
+      <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <!-- TAB 1: OVERVIEW / HERO -->
         @if (activeTab() === 'overview') {
@@ -198,20 +230,20 @@ interface Skill {
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   Offen für eine Informatiklehre
                 </div>
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Ich entwickle <br/>
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">moderne Webanwendungen</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight break-words">
+                  Logik verstehen. <br/>
+                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">Probleme lösen. IT gestalten.</span>
                 </h1>
                 <p class="text-slate-400 text-base md:text-lg leading-relaxed">
                   Ich interessiere mich für moderne Webentwicklung und arbeite mit Angular, Python, FastAPI, Docker und PostgreSQL.
                 </p>
 
                 <div class="flex flex-wrap gap-4 pt-2">
-                  <button (click)="activeTab.set('projects')" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/25">
+                  <button (click)="activeTab.set('projects')" class="w-full sm:w-auto justify-center px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/25">
                     <span>Projekte entdecken</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </button>
-                  <button (click)="activeTab.set('architecture')" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center gap-2">
+                  <button (click)="activeTab.set('architecture')" class="w-full sm:w-auto justify-center px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center gap-2">
                     <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                     <span>Architektur ansehen</span>
                   </button>
@@ -219,40 +251,40 @@ interface Skill {
               </div>
 
               <!-- Tech Badge Stack Visual -->
-              <div appRevealOnScroll class="w-full md:w-80 bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur relative overflow-hidden">
+              <div appRevealOnScroll class="w-full md:w-80 min-w-0 bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Meine Technologien</h3>
                 <div class="space-y-3">
-                  <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <div class="flex items-center gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                    <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                      <span class="text-sm font-semibold text-slate-200">Angular 18+</span>
+                      <span class="text-sm font-semibold text-slate-200 break-words">Angular 18+</span>
                     </div>
                     <span class="text-xs text-slate-400">Frontend</span>
                   </div>
-                  <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <div class="flex items-center gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                    <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                       <span class="text-sm font-semibold text-slate-200">FastAPI (Python)</span>
                     </div>
                     <span class="text-xs text-slate-400">Backend</span>
                   </div>
-                  <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <div class="flex items-center gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                    <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-blue-500"></span>
                       <span class="text-sm font-semibold text-slate-200">PostgreSQL</span>
                     </div>
                     <span class="text-xs text-slate-400">Datenbank</span>
                   </div>
-                  <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <div class="flex items-center gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                    <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
                       <span class="text-sm font-semibold text-slate-200">Docker & Compose</span>
                     </div>
                     <span class="text-xs text-slate-400">Betrieb</span>
                   </div>
-                  <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <div class="flex items-center gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                    <div class="flex min-w-0 items-center gap-3">
                       <span class="w-3 h-3 rounded-full bg-purple-400"></span>
                       <span class="text-sm font-semibold text-slate-200">GitHub Actions</span>
                     </div>
@@ -285,7 +317,7 @@ interface Skill {
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <p class="text-orange-400 mb-2 font-mono text-xs uppercase tracking-wider font-bold">Reddit</p>
-                  <h2 class="text-2xl font-bold text-white">Meine Reddit-Beiträge</h2>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">Meine Reddit-Beiträge</h2>
                   <p class="text-slate-400 text-sm mt-1">Meine neuesten Beiträge von u/Timschweizerch.</p>
                 </div>
                 <a href="https://www.reddit.com/user/Timschweizerch/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-sm font-semibold transition-colors">
@@ -346,7 +378,7 @@ interface Skill {
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <p class="text-slate-300 mb-2 font-mono text-xs uppercase tracking-wider font-bold">GitHub</p>
-                  <h2 class="text-2xl font-bold text-white">Meine GitHub-Projekte</h2>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white break-words">Meine GitHub-Projekte</h2>
                   <p class="text-slate-400 text-sm mt-1">Meine neuesten öffentlichen Repositories von {{ githubUsername }}.</p>
                 </div>
                 <a href="https://github.com/{{ githubUsername }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors">
@@ -412,7 +444,7 @@ interface Skill {
               @for (proj of projects(); track proj.title) {
                 <div appRevealOnScroll class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
                   <div>
-                    <div class="flex justify-between items-start mb-3">
+                    <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
                       <span class="text-xs font-semibold px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                         {{ proj.category }}
                       </span>
@@ -462,7 +494,7 @@ interface Skill {
 
                 <div class="space-y-4">
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Angular & Angular Material</span>
                       <span class="text-indigo-400">Fortgeschritten</span>
                     </div>
@@ -472,7 +504,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Python & FastAPI / Pydantic</span>
                       <span class="text-emerald-400">Fortgeschritten</span>
                     </div>
@@ -482,7 +514,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">TypeScript & RxJS / Signals</span>
                       <span class="text-indigo-400">Gute Kenntnisse</span>
                     </div>
@@ -492,7 +524,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">RESTful API Design & OpenAPI</span>
                       <span class="text-emerald-400">Fortgeschritten</span>
                     </div>
@@ -512,7 +544,7 @@ interface Skill {
 
                 <div class="space-y-4">
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">PostgreSQL & SQL Optimization</span>
                       <span class="text-cyan-400">Gute Kenntnisse</span>
                     </div>
@@ -522,7 +554,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Docker & Docker Compose</span>
                       <span class="text-cyan-400">Gute Kenntnisse</span>
                     </div>
@@ -532,7 +564,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">Git & GitHub Actions CI/CD</span>
                       <span class="text-purple-400">Gute Kenntnisse</span>
                     </div>
@@ -542,7 +574,7 @@ interface Skill {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-sm font-medium mb-1">
+                    <div class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm font-medium mb-1">
                       <span class="text-slate-200">SQLAlchemy & Database Migrations</span>
                       <span class="text-emerald-400">Gute Kenntnisse</span>
                     </div>
@@ -599,33 +631,36 @@ interface Skill {
               <p class="text-slate-400 text-sm mt-2">Ich freue mich über den Austausch zu Ausbildungsplätzen, Softwareprojekten und Zusammenarbeit.</p>
             </div>
 
-            <div appRevealOnScroll class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-8 space-y-6">
+            <div appRevealOnScroll class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 sm:p-8 space-y-6">
               @if (formSubmitted()) {
                 <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center space-y-2">
                   <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold">✓</div>
                   <h3 class="text-lg font-bold text-white">Nachricht erfolgreich gesendet!</h3>
-                  <p class="text-sm text-slate-300">Vielen Dank für deine Nachricht. In der produktiven Version wird sie an FastAPI und PostgreSQL übermittelt.</p>
+                  <p class="text-sm text-slate-300">Vielen Dank! Deine Nachricht wurde per E-Mail zugestellt.</p>
                   <button (click)="formSubmitted.set(false)" class="mt-4 text-xs font-semibold text-indigo-400 hover:underline">Weitere Nachricht senden</button>
                 </div>
               } @else {
                 <form (submit)="handleSubmit($event)" class="space-y-4">
+                  @if (contactError()) {
+                    <p class="text-sm text-red-300" role="alert">{{ contactError() }}</p>
+                  }
                   <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Dein Name</label>
-                    <input type="text" required placeholder="z. B. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <input name="name" type="text" required maxlength="100" placeholder="z. B. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">E-Mail-Adresse</label>
-                    <input type="email" required placeholder="name@beispiel.ch" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <input name="email" type="email" required maxlength="254" placeholder="name@beispiel.ch" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Deine Nachricht</label>
-                    <textarea rows="4" required placeholder="Hallo Tim, ich würde dich gerne kennenlernen ..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                    <textarea name="message" rows="4" required maxlength="5000" placeholder="Hallo Tim, ich würde dich gerne kennenlernen ..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
                   </div>
 
-                  <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/25">
-                    Nachricht senden
+                  <button type="submit" [disabled]="contactSending()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/25">
+                    {{ contactSending() ? 'Wird gesendet ...' : 'Nachricht senden' }}
                   </button>
                 </form>
               }
@@ -663,6 +698,8 @@ export class App {
   activeTab = signal<'overview' | 'projects' | 'skills' | 'architecture' | 'contact'>('overview');
   selectedCodeFile = signal<'fastapi' | 'database' | 'docker' | 'github'>('fastapi');
   formSubmitted = signal(false);
+  contactSending = signal(false);
+  contactError = signal('');
   currentYear = new Date().getFullYear();
   isDarkMode = signal(false);
   redditPosts = signal<RedditPost[]>([]);
@@ -771,7 +808,39 @@ export class App {
 
   handleSubmit(event: Event) {
     event.preventDefault();
-    this.formSubmitted.set(true);
+    const form = event.currentTarget;
+    if (!(form instanceof HTMLFormElement)) {
+      this.contactError.set('Das Kontaktformular konnte nicht gelesen werden. Bitte lade die Seite neu.');
+      return;
+    }
+
+    const values = new FormData(form);
+    const name = values.get('name');
+    const email = values.get('email');
+    const message = values.get('message');
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
+      this.contactError.set('Bitte fülle alle Felder aus.');
+      return;
+    }
+
+    this.contactSending.set(true);
+    this.contactError.set('');
+    this.http.post<{ message: string }>('/api/contact', { name, email, message })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.contactSending.set(false);
+          if (response.message !== 'sent') {
+            this.contactError.set('Der E-Mail-Versand konnte nicht bestätigt werden. Bitte versuche es erneut.');
+            return;
+          }
+          this.formSubmitted.set(true);
+        },
+        error: (error: unknown) => {
+          this.contactSending.set(false);
+          this.contactError.set(getContactErrorMessage(error));
+        },
+      });
   }
 
   getFileTitle(file: string): string {

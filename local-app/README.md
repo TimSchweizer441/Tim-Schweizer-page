@@ -14,6 +14,12 @@ Copy-Item .env.example .env
 
 Reddit posts load through the local server and refresh every five minutes. Reddit may not expose a public view count for every post, so the page only shows views when the API includes that value.
 
+## Contact form email delivery
+
+The contact form sends messages through Gmail SMTP to `timschweizer.ch@gmail.com`. Set `SMTP_USER` to the Gmail account used to send and `SMTP_APP_PASSWORD` to an app password for that account in `.env`. Create an app password in your Google Account after enabling 2-Step Verification. Do not use your regular Gmail password or commit `.env`. Restart `npm start` after changing `.env`.
+
+The form reports success only after Gmail accepts the message. Replies go to the sender's email address.
+
 ## GitHub repositories
 
 The portfolio loads the six most recently updated public repositories for `GITHUB_USERNAME` from the unauthenticated GitHub REST API. Set `GITHUB_USERNAME` in `.env` to use another account. Repository data refreshes every five minutes; no GitHub token is required.

@@ -29,6 +29,34 @@
 body {
   background: var(--page-background);
   color: var(--primary-text);
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+  min-height: 100dvh;
+}
+
+.mobile-nav {
+  align-content: flex-start;
+}
+
+.mobile-nav-button {
+  min-height: 2.75rem;
+  flex: 0 0 auto;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  color: var(--secondary-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mobile-nav-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .bg-slate-900 {
@@ -226,6 +254,16 @@ button.text-white,
   min-width: 2.25rem;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+@media (max-width: 420px) {
+  .theme-toggle-label {
+    display: none;
+  }
+
+  .theme-toggle {
+    padding: 0;
+  }
 }
 
 .scroll-reveal {
