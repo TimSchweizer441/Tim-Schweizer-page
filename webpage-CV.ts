@@ -162,7 +162,9 @@ interface Skill {
       <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-3 sm:px-6 py-3 sm:py-4">
         <div class="max-w-6xl mx-auto flex flex-wrap items-center gap-x-3 gap-y-3">
           <div class="flex min-w-0 items-center gap-2 sm:gap-3">
-            <img src="/profilebild.jpeg" alt="Tim Schweizer" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
+            <button type="button" (click)="activeTab.set('overview')" aria-label="Über mich" class="shrink-0 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-400">
+              <img src="/profilebild.jpeg" alt="" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover object-[72%_45%] ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-500/20" />
+            </button>
             <div class="min-w-0">
               <span class="font-bold text-base sm:text-lg text-white block leading-tight">Tim Schweizer</span>
               <span class="text-[10px] sm:text-xs text-indigo-400 font-medium leading-tight">Angehender Informatiklehrling</span>
@@ -203,7 +205,6 @@ interface Skill {
                 </svg>
               </span>
             </span>
-            <span class="theme-toggle-label">{{ isDarkMode() ? 'Nacht' : 'Tag' }}</span>
           </button>
           </div>
           <div class="mobile-nav lg:hidden flex w-full flex-wrap gap-2">
@@ -363,7 +364,7 @@ interface Skill {
                       <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{{ post.selftext }}</p>
                     }
                     <div class="flex items-center justify-between gap-4 mt-4">
-                      <span class="text-xs text-slate-500">{{ post.createdUtc * 1000 | date:'mediumDate' }}</span>
+                      <span class="text-xs text-slate-500">{{ post.createdUtc * 1000 | date:'d. MMM' }}</span>
                       <a [href]="post.permalink" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-orange-400 hover:text-orange-300">
                         Auf Reddit ansehen &rarr;
                       </a>
@@ -419,7 +420,7 @@ interface Skill {
                       }
                       <span>{{ repository.stars | number }} Sterne</span>
                       <span>{{ repository.forks | number }} Forks</span>
-                      <span>Aktualisiert am {{ repository.updatedAt | date:'mediumDate' }}</span>
+                      <span>Aktualisiert am {{ repository.updatedAt | date:'d. MMM' }}</span>
                     </div>
                     <a [href]="repository.htmlUrl" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 text-sm font-semibold text-indigo-400 hover:text-indigo-300">
                       Repository ansehen &rarr;
@@ -645,7 +646,7 @@ interface Skill {
                   }
                   <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Dein Name</label>
-                    <input name="name" type="text" required maxlength="100" placeholder="z. B. Sarah Connor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                    <input name="name" type="text" required maxlength="100" placeholder="z. B. Tim Schweizer" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
                   </div>
 
                   <div>
@@ -683,7 +684,7 @@ interface Skill {
       <!-- Footer -->
       <footer class="mt-20 border-t border-slate-800 py-8 text-center text-xs text-slate-500">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {{ currentYear }} Tim Schweizer — Portfolio</p>
+          <p>Tim Schweizer — Portfolio</p>
           <p class="font-mono text-slate-600">Erstellt mit Angular, FastAPI, PostgreSQL und Docker</p>
         </div>
       </footer>
@@ -699,7 +700,6 @@ export class App {
   formSubmitted = signal(false);
   contactSending = signal(false);
   contactError = signal('');
-  currentYear = new Date().getFullYear();
   isDarkMode = signal(false);
   redditPosts = signal<RedditPost[]>([]);
   redditLoading = signal(false);
