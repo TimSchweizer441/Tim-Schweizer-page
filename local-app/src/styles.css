@@ -167,9 +167,9 @@ button.text-white,
 .theme-transition,
 .theme-transition :where(*) {
   transition:
-    background-color 350ms ease,
-    color 350ms ease,
-    border-color 350ms ease;
+    background-color 500ms ease-in-out,
+    color 500ms ease-in-out,
+    border-color 500ms ease-in-out;
 }
 
 .theme-toggle {
@@ -197,7 +197,7 @@ button.text-white,
   padding: 0.2rem;
   border-radius: 9999px;
   background: #dbeafe;
-  transition: background-color 300ms ease;
+  transition: background-color 500ms ease-in-out;
 }
 
 .theme-toggle-track.is-dark {
@@ -215,7 +215,7 @@ button.text-white,
   background: #fff;
   box-shadow: 0 1px 4px rgb(15 23 42 / 25%);
   transform: translateX(0);
-  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1), color 300ms ease;
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1), color 500ms ease-in-out;
 }
 
 .theme-toggle-track.is-dark .theme-toggle-thumb {
@@ -227,7 +227,7 @@ button.text-white,
   position: absolute;
   width: 0.9rem;
   height: 0.9rem;
-  transition: opacity 180ms ease, transform 300ms ease;
+  transition: opacity 300ms ease-in-out, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .theme-toggle-sun {
@@ -248,12 +248,6 @@ button.text-white,
 .theme-toggle-moon.is-visible {
   opacity: 1;
   transform: rotate(0) scale(1);
-}
-
-.theme-toggle-label {
-  min-width: 2.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
 }
 
 .language-toggle {
@@ -279,10 +273,6 @@ button.text-white,
 }
 
 @media (max-width: 420px) {
-  .theme-toggle-label {
-    display: none;
-  }
-
   .theme-toggle {
     padding: 0;
   }
