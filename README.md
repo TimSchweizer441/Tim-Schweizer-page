@@ -48,6 +48,8 @@ npm test
 
 Für statisches Hosting (z. B. GitHub Pages oder Netlify) den Inhalt von `local-app/dist/local-app/browser` deployen. Der Build enthält eine HTML-Datei sowie die dazugehörigen JavaScript-, CSS- und Asset-Dateien.
 
+Eine gebaute Version liegt bereits im Repository unter `local-app/dist/local-app/browser` und kann direkt per FTP hochgeladen werden. Nach Änderungen an der Website den Ordner mit `npm run build:static` aktualisieren.
+
 Die statische Seite benötigt kein Angular- oder Node.js-Setup beim Hoster. Reddit-Beiträge, GitHub-Repositories und der E-Mail-Versand verwenden jedoch den API-Server und funktionieren erst, wenn dieser separat online bereitgestellt und unter derselben Domain unter `/api` erreichbar ist.
 
 ## Projektstruktur
