@@ -52,6 +52,14 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+For static hosting, run:
+
+```bash
+npm run build:static
+```
+
+Deploy the contents of `dist/local-app/browser`. The generated site is a static Angular frontend; Reddit posts, GitHub repositories, and contact form email still require the API server to be deployed and reachable under `/api`.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
