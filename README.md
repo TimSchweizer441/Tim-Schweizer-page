@@ -41,9 +41,14 @@ Verwende für SMTP ein Google-App-Passwort, nicht dein reguläres Gmail-Passwort
 ## Build und Tests
 
 ```powershell
-npm run build
+Set-Location local-app
+npm run build:static
 npm test
 ```
+
+Für statisches Hosting (z. B. GitHub Pages oder Netlify) den Inhalt von `local-app/dist/local-app/browser` deployen. Der Build enthält eine HTML-Datei sowie die dazugehörigen JavaScript-, CSS- und Asset-Dateien.
+
+Die statische Seite benötigt kein Angular- oder Node.js-Setup beim Hoster. Reddit-Beiträge, GitHub-Repositories und der E-Mail-Versand verwenden jedoch den API-Server und funktionieren erst, wenn dieser separat online bereitgestellt und unter derselben Domain unter `/api` erreichbar ist.
 
 ## Projektstruktur
 
